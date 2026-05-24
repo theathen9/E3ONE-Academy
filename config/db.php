@@ -1,6 +1,8 @@
 <?php
 // ./config/db.php
-
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $host = getenv('DB_HOST');
 $dbname = getenv('DB_NAME');
 $username = getenv('DB_USER');
