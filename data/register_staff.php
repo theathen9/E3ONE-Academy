@@ -114,6 +114,7 @@ function register_staff($conn, $idCode)
             <div class="row g-3 mb-5">
                 <div class="col-lg-3">
                     <input
+                        required
                         type="text"
                         id="dob"
                         name="dob"
@@ -156,6 +157,7 @@ function register_staff($conn, $idCode)
                 </div>
                 <div class="col-lg-3">
                     <input
+                        required
                         type="text"
                         id="hired_at"
                         name="hired_at"
@@ -397,13 +399,20 @@ function register_staff($conn, $idCode)
             e.preventDefault();
 
             btn.disabled = true;
+            try {
 
-            const form = document.querySelector("#staffSection form");
-            form.submit();
+                const form = document.querySelector("#staffSection form");
+                form.submit();
 
-            setTimeout(() => {
-                window.location.href = "<?= BASE_URL ?>/admin/register.php";
-            }, 500);
+                setTimeout(() => {
+                    window.location.href = "<?= BASE_URL ?>/admin/register.php";
+                }, 900);
+
+            } catch (error) {
+
+            }
+
+
         });
     </script>
 <?php

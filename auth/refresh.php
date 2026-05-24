@@ -1,119 +1,72 @@
 <?php
-// ./auth/refresh.php
-date_default_timezone_set('Asia/Phnom_Penh');
-
-include "../config/db.php";
-include "../config/app.php";
 
 header('Content-Type: application/json');
+session_start();
 
-$response = [
-    "success" => false,
-    "message" => "Unauthorized"
-];
+require_once __DIR__ . '/../config/bootstrap.php';
 
-// ❌ No refresh token
+global $conn;
+
 if (empty($_COOKIE['refresh_token'])) {
-    echo json_encode($response);
+    http_response_code(401);
+    echo json_encode(["error" => "No refresh token"]);
     exit;
 }
 
-$refreshToken = $_COOKIE['refresh_token'];
-$hashedRefresh = hash('sha256', $refreshToken);
+// =========================
+// VERIFY REFRESH TOKEN
+// =========================
 
-// 🔍 Find user by refresh token
+$hashedRefresh = hash('sha256', $_COOKIE['refresh_token']);
+
 $stmt = $conn->prepare("
-    SELECT * FROM tblUsers 
+    SELECT user_id, refresh_token, refresh_expiry
+    FROM tblUsers
     WHERE refresh_token = ?
     LIMIT 1
 ");
 
 $stmt->bind_param("s", $hashedRefresh);
 $stmt->execute();
-$result = $stmt->get_result();
 
-if (!$result || !$row = $result->fetch_assoc()) {
-    echo json_encode($response);
+$user = $stmt->get_result()->fetch_assoc();
+
+if (!$user || strtotime($user['refresh_expiry']) <= time()) {
+    http_response_code(401);
+    echo json_encode(["error" => "Refresh expired"]);
     exit;
 }
 
-// ⏳ Check expiry
-if (strtotime($row['refresh_expiry']) < time()) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Refresh token expired"
-    ]);
-    exit;
-}
+// =========================
+// GENERATE NEW ACCESS TOKEN
+// =========================
 
-$userId = $row['user_id'];
+$newAccessToken = bin2hex(random_bytes(32));
+$hashedAccess = hash('sha256', $newAccessToken);
+$expiry = date('Y-m-d H:i:s', strtotime('+5 minutes'));
 
-// 🔐 Generate new tokens
-$newAccessToken  = bin2hex(random_bytes(32));
-$newRefreshToken = bin2hex(random_bytes(64));
-
-$hashedAccess  = hash('sha256', $newAccessToken);
-$hashedRefresh = hash('sha256', $newRefreshToken);
-
-$accessExpiry  = date('Y-m-d H:i:s', strtotime('+15 minutes'));
-$refreshExpiry = date('Y-m-d H:i:s', strtotime('+7 days'));
-
-// 💾 Update DB
 $update = $conn->prepare("
-    UPDATE tblUsers 
-    SET access_token=?, refresh_token=?, access_expiry=?, refresh_expiry=? 
-    WHERE user_id=?
+    UPDATE tblUsers
+    SET access_token = ?, access_expiry = ?
+    WHERE user_id = ?
 ");
 
-$update->bind_param(
-    "ssssi",
-    $hashedAccess,
-    $hashedRefresh,
-    $accessExpiry,
-    $refreshExpiry,
-    $userId
-);
-
+$update->bind_param("ssi", $hashedAccess, $expiry, $user['user_id']);
 $update->execute();
 
-// 🍪 Secure cookie settings
-$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+// =========================
+// SET COOKIE
+// =========================
 
-// ✅ Set new cookies (RAW tokens)
 setcookie("access_token", $newAccessToken, [
-    'expires' => strtotime($accessExpiry),
+    'expires' => strtotime($expiry),
     'path' => '/',
-    'secure' => $secure,
     'httponly' => true,
-    'samesite' => 'Strict'
-]);
-
-setcookie("refresh_token", $newRefreshToken, [
-    'expires' => strtotime($refreshExpiry),
-    'path' => '/',
-    'secure' => $secure,
-    'httponly' => true,
-    'samesite' => 'Strict'
+    'secure' => !empty($_SERVER['HTTPS']),
+    'samesite' => 'Lax'
 ]);
 
 echo json_encode([
-    "success" => true,
-    "message" => "Token refreshed"
+    "access_token" => $newAccessToken,
+    "expires_in" => 300
 ]);
-
-
-// How to use it (Frontend / AJAX)
-
-// fetch('/auth/refresh.php', {
-//     method: 'POST',
-//     credentials: 'include'
-// })
-// .then(res => res.json())
-// .then(data => {
-//     if (data.success) {
-//         // retry original request
-//     } else {
-//         // redirect to login
-//         window.location.href = '/auth/signin.php';
-//     }
-// });

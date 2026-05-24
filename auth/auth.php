@@ -1,5 +1,6 @@
 <?php
 // ./auth/auth.php
+// header('Content-Type: application/json');
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -11,8 +12,13 @@ function checkAuth()
 {
     global $conn;
 
-    // 1. SESSION
-    if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
+    // 1. SESSION 
+    if (
+        isset($_SESSION['loggedin']) &&
+        $_SESSION['loggedin'] === true &&
+        isset($_SESSION['last_auth_check']) &&
+        (time() - $_SESSION['last_auth_check']) < 300 // 5 min
+    ) {
         return $_SESSION['user_id'];
     }
 
@@ -20,7 +26,7 @@ function checkAuth()
     $userId = verifyUserCookie();
 
     if (!$userId) {
-        return false; // ✅ FIX: no redirect here
+        return false;
     }
 
     // 3. LOAD USER
@@ -59,6 +65,7 @@ function checkAuth()
     $_SESSION['reference_type'] = $user['reference_type'];
     // $_SESSION['role_id'] = (int)$user['role_id'];
     $_SESSION['role'] = $user['role_name'] ?? false;
+    $_SESSION['last_auth_check'] = time();
 
     return (int)$user['user_id'];
 }
@@ -155,18 +162,26 @@ function verifyUserCookie()
     $now = time();
 
     // =========================
-    // 3. VALID ACCESS TOKEN
+    // 3. CHECK ACCESS TOKEN
     // =========================
+
+    $accessValid = false;
+    $accessExpired = true;
+
     if (!empty($_COOKIE['access_token'])) {
 
         $hashedAccess = hash('sha256', $_COOKIE['access_token']);
 
-        if (
-            hash_equals($res['access_token'], $hashedAccess) &&
-            strtotime($res['access_expiry']) > $now
-        ) {
-            return $userId;
-        }
+        $accessValid =
+            hash_equals($res['access_token'], $hashedAccess);
+
+        $accessExpired =
+            strtotime($res['access_expiry']) <= $now;
+    }
+
+    // CASE 1: access token still valid → allow
+    if ($accessValid && !$accessExpired) {
+        return $userId;
     }
 
     // =========================
@@ -190,31 +205,28 @@ function verifyUserCookie()
     // 5. ROTATE TOKENS
     // =========================
     $newAccessToken  = bin2hex(random_bytes(32));
-    $newRefreshToken = bin2hex(random_bytes(64));
+    // $newRefreshToken = bin2hex(random_bytes(64));
 
     $hashedAccessToken  = hash('sha256', $newAccessToken);
-    $hashedRefreshToken = hash('sha256', $newRefreshToken);
+    // $hashedRefreshToken = hash('sha256', $newRefreshToken);
 
-    $newAccessExpiry  = date('Y-m-d H:i:s', strtotime('+30 minutes'));
-    $newRefreshExpiry = date('Y-m-d H:i:s', strtotime('+1 days'));
+    $newAccessExpiry  = date('Y-m-d H:i:s', strtotime('+5 minutes'));
+    // $newRefreshExpiry = date('Y-m-d H:i:s', strtotime('+3 minutes'));
+    // $newRefreshExpiry = date('Y-m-d H:i:s', strtotime('+7 days'));
 
     $update = $conn->prepare("
         UPDATE tblUsers
         SET access_token = ?, 
-            access_expiry = ?, 
-            refresh_token = ?, 
-            refresh_expiry = ?
+            access_expiry = ?
         WHERE user_id = ?
     ");
 
     if (!$update) return false;
 
     $update->bind_param(
-        "ssssi",
+        "ssi",
         $hashedAccessToken,
         $newAccessExpiry,
-        $hashedRefreshToken,
-        $newRefreshExpiry,
         $userId
     );
 
@@ -230,28 +242,20 @@ function verifyUserCookie()
     $newSignature = hash_hmac('sha256', $userId, APP_SECRET);
     $cookieValue = $userId . "." . $newSignature;
 
-    $cookieOptions = [
+    // $cookieOptions = [
+    //     'path' => '/',
+    //     'secure' => $isSecure,
+    //     'httponly' => true,
+    //     'samesite' => 'Lax' // safer for dev
+    // ];
+
+    setcookie("access_token", $newAccessToken, [
+        'expires' => strtotime($newAccessExpiry),
         'path' => '/',
         'secure' => $isSecure,
         'httponly' => true,
-        'samesite' => 'Lax' // safer for dev
-    ];
-
-    setcookie("c_user", $cookieValue, array_merge(
-        $cookieOptions,
-        ['expires' => strtotime($newRefreshExpiry)]
-    ));
-
-    setcookie("access_token", $newAccessToken, $cookieOptions + [
-        'expires' => strtotime($newAccessExpiry)
+        'samesite' => 'Lax'
     ]);
-
-    setcookie("refresh_token", $newRefreshToken, $cookieOptions + [
-        'expires' => strtotime($newRefreshExpiry)
-    ]);
-
-    
-
 
     return $userId;
 }

@@ -1,16 +1,10 @@
 <?php
 // ./auth/signin.php (from Page)
 date_default_timezone_set('Asia/Phnom_Penh');
-
 include_once __DIR__ . '/../config/bootstrap.php';
-
-
-$success = "";
-$error = "";
-
-
-if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
-
+include_once __DIR__ . '/../auth/auth.php';
+$user = checkAuth();
+if ($user && isset($_SESSION['loggedin'])) {
     switch (strtolower($_SESSION['role'])) {
         case 'admin':
             header("Location: " . BASE_URL . "/admin/dashboard.php");
@@ -30,7 +24,8 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
     }
     exit();
 }
-
+$success = "";
+$error = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     verifyCSRF(); // 🔥 ADD THIS
 
@@ -44,23 +39,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $id = intval($user);
 
         $stmt = $conn->prepare(
-            "SELECT 
-        u.user_id, 
-        u.username, 
-        u.password, 
-        u.role_id, 
-        r.role_name, 
-        u.email,
-        u.reference_id,
-        u.reference_type,
-        u.user_agent,
-        u.ip_address
+            "SELECT  u.user_id,  u.username,  u.password,  u.role_id,  r.role_name,  u.email,
+        u.reference_id, u.reference_type, u.user_agent, u.ip_address
      FROM tblUsers u
      LEFT JOIN tblRoles r ON u.role_id = r.role_id
      WHERE u.username = ? OR u.user_id = ? OR u.email = ?
      LIMIT 1"
         );
-
         $stmt->bind_param("sis", $user, $id, $user);
         $stmt->execute();
 
@@ -68,35 +53,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($result && $row = $result->fetch_assoc()) {
             if (password_verify($pass, $row["password"])) {
-
                 session_regenerate_id(true);
-
-                // 🔐 Generate tokens
                 $accessToken  = bin2hex(random_bytes(32));
                 $refreshToken = bin2hex(random_bytes(64));
                 $hashedRefresh = hash('sha256', $refreshToken);
                 $hashedToken = hash('sha256', $accessToken);
 
-                $accessExpiry  = date('Y-m-d H:i:s', strtotime('+30 minutes'));
+                $accessExpiry  = date('Y-m-d H:i:s', strtotime('+5 minutes'));
                 $refreshExpiry = date('Y-m-d H:i:s', strtotime('+1 days'));
-
-                // Save to DB
-                $update = $conn->prepare("UPDATE tblUsers SET last_login = NOW(), access_token=?, refresh_token=?, access_expiry=?, refresh_expiry=? WHERE user_id=?");
+                // $refreshExpiry = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+                $update = $conn->prepare("UPDATE tblUsers SET last_login = NOW(), access_token=?, refresh_token=?, 
+                access_expiry=?, refresh_expiry=? WHERE user_id=?");
                 $update->bind_param("ssssi", $hashedToken, $hashedRefresh, $accessExpiry, $refreshExpiry, $row['user_id']);
                 $update->execute();
 
-                // Store session (optional)
                 $_SESSION['loggedin'] = true;
                 $_SESSION["user_id"] = $row["user_id"];
                 // $_SESSION["role_id"] = $row["role_id"];
                 $_SESSION["role"] = strtolower($row["role_name"]);
-
-                // ✅ ADD THESE
                 $_SESSION["reference_id"] = $row["reference_id"];
                 $_SESSION["reference_type"] = $row["reference_type"];
-
+                // $_SESSION['last_auth_check'] = time();
                 $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
-
                 setcookie("access_token", $accessToken, [
                     'expires' => strtotime($accessExpiry),
                     'path' => '/',
@@ -104,12 +82,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     'httponly' => true,
                     'samesite' => 'Lax'
                 ]);
-
                 $userId = $_SESSION["user_id"];
                 $signature = hash_hmac('sha256', $userId, APP_SECRET);
-
                 $value = $userId . "." . $signature;
-
                 setcookie("c_user", $value, [
                     'expires' => strtotime($refreshExpiry),
                     'path' => '/',
@@ -117,7 +92,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     'httponly' => true,
                     'samesite' => 'Lax'
                 ]);
-
                 setcookie("refresh_token", $refreshToken, [
                     'expires' => strtotime($refreshExpiry),
                     'path' => '/',
@@ -125,8 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     'httponly' => true,
                     'samesite' => 'Lax'
                 ]);
-
-                switch ($row["role"]) {
+                switch (strtolower($row["role_name"])) {
                     case "admin":
                         header("Location: ../admin/dashboard.php");
                         break;
@@ -142,7 +115,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 exit;
             }
         }
-
         $error = "Invalid username or password!";
     }
 }
@@ -180,7 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                             <form method="post" class="m-3" autocomplete="off">
                                 <!-- <input type="hidden" name="csrf_token" value="<?= generateCSRF() ?>"> -->
-                                 <?= csrf_field() ?>
+                                <?= csrf_field() ?>
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control" id="username" placeholder="Username or ID"
                                         name="username">

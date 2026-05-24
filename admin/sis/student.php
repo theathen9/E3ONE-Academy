@@ -352,9 +352,11 @@ background: linear-gradient(139deg, rgba(0, 109, 156, 1) 32%, rgba(0, 109, 156, 
                 if (data.success) {
                     document.querySelector("#username").innerText = data.data.username;
 
-                    document.querySelector("#profileImg").src =
-                        "http://localhost/system-management/uploads/photos/" +
-                        data.data.profile_image;
+                    const profileImg = data.data.profile_image ?
+                        "/system-management/uploads/photos/" + data.data.profile_image :
+                        "/system-management/src/assets/default-user.png";
+
+                    document.querySelector("#profileImg").src = profileImg;
                 } else {
                     console.log("Failed:", data);
                 }

@@ -438,13 +438,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (data.success) {
                     document.querySelector("#username").innerText = data.data.username;
 
-                    document.querySelector("#profileImg").src =
-                        "http://localhost/system-management/uploads/photos/" +
-                        data.data.profile_image;
+                    const profileImg = data.data.profile_image ?
+                        "/system-management/uploads/photos/" + data.data.profile_image :
+                        "/system-management/src/assets/default-user.png";
+
+                    document.querySelector("#profileImg").src = profileImg;
                 } else {
                     console.log("Failed:", data);
                 }
             });
+
         let selectedRow = null;
         let selectedId = null;
 

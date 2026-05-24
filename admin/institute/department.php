@@ -16,12 +16,13 @@ include_once __DIR__ . '/../../components/Navbar.php';
 // print_r($_POST);
 // exit;
 
-checkAuth();
-$userId = verifyUserCookie();
+$userId = checkAuth();
+
 if (!$userId) {
     header("Location: ../auth/signin.php");
     exit;
 }
+
 authorizeRole('admin');
 
 // include_once "/config/db.php";
@@ -557,21 +558,23 @@ background: linear-gradient(139deg, rgba(0, 109, 156, 1) 32%, rgba(0, 109, 156, 
     <script src="../../script.js"></script>
 
     <script>
-        fetch("http://localhost/system-management/api/v1/users.php", {
-                credentials: "include"
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.querySelector("#username").innerText = data.data.username;
+         fetch("http://localhost/system-management/api/v1/users.php", {
+                    credentials: "include"
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.querySelector("#username").innerText = data.data.username;
 
-                    document.querySelector("#profileImg").src =
-                        "http://localhost/system-management/uploads/photos/" +
-                        data.data.profile_image;
-                } else {
-                    console.log("Failed:", data);
-                }
-            });
+                        const profileImg = data.data.profile_image ?
+                            "/system-management/uploads/photos/" + data.data.profile_image :
+                            "/system-management/src/assets/default-user.png";
+
+                        document.querySelector("#profileImg").src = profileImg;
+                    } else {
+                        console.log("Failed:", data);
+                    }
+                });
 
         let selectedRow = null;
         let selectedId = null;

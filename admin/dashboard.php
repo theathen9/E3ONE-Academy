@@ -216,7 +216,7 @@
                         </button> -->
 
                         <button id="account" class="d-flex align-items-center border-0 bg-white gap-2" data-bs-toggle="dropdown">
-                            <img id="profileImg" width="60" height="60" style="border-radius:50%">
+                            <img  id="profileImg" width="60" height="60" style="border-radius:50%">
                             <div id="username"></div>
                         </button>
 

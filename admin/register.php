@@ -83,10 +83,6 @@ $lastId = $res['student_id'] ?? 0;
 $idCode = $lastId + 1;
 
 
-
-
-
-
 $classes = [];
 function formatDays($days)
 {
@@ -392,11 +388,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // events
         studentBtn.addEventListener("click", () => {
 
+            type = "student";
+
+            console.log(type);
+
+            const studentPrefixes = [
+                "student_birth_addr",
+                "student_curr_addr",
+                "student_guardian_curr_addr"
+            ];
+
+            studentPrefixes.forEach(setupAddressAPI);
+
             toggleSection(studentSection, staffSection, studentBtn, staffBtn);
 
         });
 
         staffBtn.addEventListener("click", () => {
+
+            type = "staff";
+
+
+            console.log(type);
+
+            const staffPrefixes = [
+                "birth_addr",
+                "curr_addr"
+            ];
+
+            staffPrefixes.forEach(setupAddressAPI);
 
             toggleSection(staffSection, studentSection, staffBtn, studentBtn);
 
@@ -597,29 +617,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             });
         }
+        let type = <?= json_encode($type) ?>;
 
         // INIT
         document.addEventListener("DOMContentLoaded", async function() {
 
-            const type = <?= json_encode($type) ?>;
             console.log(type);
 
-            const studentPrefixes = [
-                "student_birth_addr",
-                "student_curr_addr",
-                "student_guardian_curr_addr"
-            ];
-
-            const staffPrefixes = [
-                "birth_addr",
-                "curr_addr"
-            ];
-
-            if (type === "student") {
-                studentPrefixes.forEach(setupAddressAPI);
+            if (type === "staff") {
+                staffBtn.click(); // auto switch to staff form
             } else {
-                staffPrefixes.forEach(setupAddressAPI);
+                studentBtn.click(); // default student
             }
+
+
             flatpickr("#student_dob", {
                 altFormat: "d-m-Y", // ✅ what user sees
                 dateFormat: "Y-m-d", // ✅ value sent to backend

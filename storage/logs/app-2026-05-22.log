@@ -1,0 +1,140 @@
+[2026-05-22 18:49:10] [INFO] Employees page loaded
+[2026-05-22 18:49:10] [ERROR] Database connection failed
+[2026-05-22 18:49:10] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"18:49:10"}
+[2026-05-22 18:49:10] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 18:49:10] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 18:49:11] [INFO] Departments page loaded
+[2026-05-22 18:49:11] [ERROR] Database connection failed
+[2026-05-22 18:49:11] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"18:49:11"}
+[2026-05-22 18:49:11] [CACHE] CACHE HIT: department_list | {"key":"department_list__1_18"}
+[2026-05-22 18:49:11] [SQL] SELECT * FROM tblDepartments WHERE department_id = ? | [10]
+[2026-05-22 20:01:43] [INFO] Employees page loaded
+[2026-05-22 20:01:43] [ERROR] Database connection failed
+[2026-05-22 20:01:43] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Linux; Android 6.0; Nexus 5 Build\/MRA58N) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Mobile Safari\/537.36","time":"20:01:43"}
+[2026-05-22 20:01:43] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 20:01:43] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 20:01:45] [INFO] Departments page loaded
+[2026-05-22 20:01:45] [ERROR] Database connection failed
+[2026-05-22 20:01:45] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Linux; Android 6.0; Nexus 5 Build\/MRA58N) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Mobile Safari\/537.36","time":"20:01:45"}
+[2026-05-22 20:01:45] [CACHE] CACHE HIT: department_list | {"key":"department_list__1_18"}
+[2026-05-22 20:01:45] [SQL] SELECT * FROM tblDepartments WHERE department_id = ? | [10]
+[2026-05-22 20:01:48] [INFO] Departments page loaded
+[2026-05-22 20:01:48] [ERROR] Database connection failed
+[2026-05-22 20:01:48] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Linux; Android 6.0; Nexus 5 Build\/MRA58N) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Mobile Safari\/537.36","time":"20:01:48"}
+[2026-05-22 20:01:48] [CACHE] CACHE HIT: department_list | {"key":"department_list__1_18"}
+[2026-05-22 20:01:48] [SQL] SELECT * FROM tblDepartments WHERE department_id = ? | [10]
+[2026-05-22 20:01:48] [INFO] Employees page loaded
+[2026-05-22 20:01:48] [ERROR] Database connection failed
+[2026-05-22 20:01:48] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Linux; Android 6.0; Nexus 5 Build\/MRA58N) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Mobile Safari\/537.36","time":"20:01:48"}
+[2026-05-22 20:01:48] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 20:01:48] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 20:01:49] [INFO] Departments page loaded
+[2026-05-22 20:01:49] [ERROR] Database connection failed
+[2026-05-22 20:01:49] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Linux; Android 6.0; Nexus 5 Build\/MRA58N) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Mobile Safari\/537.36","time":"20:01:49"}
+[2026-05-22 20:01:49] [CACHE] CACHE HIT: department_list | {"key":"department_list__1_18"}
+[2026-05-22 20:01:49] [SQL] SELECT * FROM tblDepartments WHERE department_id = ? | [10]
+[2026-05-22 22:12:37] [INFO] Employees page loaded
+[2026-05-22 22:12:37] [ERROR] Database connection failed
+[2026-05-22 22:12:37] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:12:37"}
+[2026-05-22 22:12:37] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:12:37] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 22:12:39] [INFO] Employees page loaded
+[2026-05-22 22:12:39] [ERROR] Database connection failed
+[2026-05-22 22:12:39] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:12:39"}
+[2026-05-22 22:12:39] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:12:39] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 22:12:42] [INFO] Employees page loaded
+[2026-05-22 22:12:42] [ERROR] Database connection failed
+[2026-05-22 22:12:42] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:12:42"}
+[2026-05-22 22:12:42] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:12:42] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 22:12:59] [INFO] Employees page loaded
+[2026-05-22 22:12:59] [ERROR] Database connection failed
+[2026-05-22 22:12:59] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:12:59"}
+[2026-05-22 22:12:59] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:12:59] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 22:13:31] [INFO] Employees page loaded
+[2026-05-22 22:13:31] [ERROR] Database connection failed
+[2026-05-22 22:13:31] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:13:31"}
+[2026-05-22 22:13:31] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:13:31] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 22:13:32] [INFO] Employees page loaded
+[2026-05-22 22:13:32] [ERROR] Database connection failed
+[2026-05-22 22:13:32] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:13:32"}
+[2026-05-22 22:13:32] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:13:32] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 22:13:32] [INFO] Employees page loaded
+[2026-05-22 22:13:32] [ERROR] Database connection failed
+[2026-05-22 22:13:32] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:13:32"}
+[2026-05-22 22:13:32] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:13:32] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 22:14:40] [INFO] Departments page loaded
+[2026-05-22 22:14:40] [ERROR] Database connection failed
+[2026-05-22 22:14:40] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:14:40"}
+[2026-05-22 22:14:40] [CACHE] CACHE HIT: department_list | {"key":"department_list__1_18"}
+[2026-05-22 22:14:40] [SQL] SELECT * FROM tblDepartments WHERE department_id = ? | [10]
+[2026-05-22 22:14:42] [INFO] Departments page loaded
+[2026-05-22 22:14:42] [ERROR] Database connection failed
+[2026-05-22 22:14:42] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:14:42"}
+[2026-05-22 22:14:42] [CACHE] CACHE HIT: department_list | {"key":"department_list__1_18"}
+[2026-05-22 22:14:42] [SQL] SELECT * FROM tblDepartments WHERE department_id = ? | [10]
+[2026-05-22 22:14:42] [INFO] Departments page loaded
+[2026-05-22 22:14:42] [ERROR] Database connection failed
+[2026-05-22 22:14:42] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:14:42"}
+[2026-05-22 22:14:42] [CACHE] CACHE HIT: department_list | {"key":"department_list__1_18"}
+[2026-05-22 22:14:42] [SQL] SELECT * FROM tblDepartments WHERE department_id = ? | [10]
+[2026-05-22 22:14:42] [INFO] Departments page loaded
+[2026-05-22 22:14:42] [ERROR] Database connection failed
+[2026-05-22 22:14:42] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:14:42"}
+[2026-05-22 22:14:42] [CACHE] CACHE HIT: department_list | {"key":"department_list__1_18"}
+[2026-05-22 22:14:42] [SQL] SELECT * FROM tblDepartments WHERE department_id = ? | [10]
+[2026-05-22 22:14:43] [INFO] Employees page loaded
+[2026-05-22 22:14:43] [ERROR] Database connection failed
+[2026-05-22 22:14:43] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:14:43"}
+[2026-05-22 22:14:43] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:14:43] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 22:17:10] [INFO] Employees page loaded
+[2026-05-22 22:17:10] [ERROR] Database connection failed
+[2026-05-22 22:17:10] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:17:10"}
+[2026-05-22 22:17:10] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:17:10] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 22:17:11] [INFO] Departments page loaded
+[2026-05-22 22:17:11] [ERROR] Database connection failed
+[2026-05-22 22:17:11] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:17:11"}
+[2026-05-22 22:17:11] [CACHE] CACHE HIT: department_list | {"key":"department_list__1_18"}
+[2026-05-22 22:17:11] [SQL] SELECT * FROM tblDepartments WHERE department_id = ? | [10]
+[2026-05-22 22:17:14] [INFO] Employees page loaded
+[2026-05-22 22:17:14] [ERROR] Database connection failed
+[2026-05-22 22:17:14] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:17:14"}
+[2026-05-22 22:17:14] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:17:14] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 22:17:22] [INFO] Employees page loaded
+[2026-05-22 22:17:22] [ERROR] Database connection failed
+[2026-05-22 22:17:22] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:17:22"}
+[2026-05-22 22:17:22] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:17:22] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 22:17:23] [INFO] Departments page loaded
+[2026-05-22 22:17:23] [ERROR] Database connection failed
+[2026-05-22 22:17:23] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:17:23"}
+[2026-05-22 22:17:23] [CACHE] CACHE HIT: department_list | {"key":"department_list__1_18"}
+[2026-05-22 22:17:23] [SQL] SELECT * FROM tblDepartments WHERE department_id = ? | [10]
+[2026-05-22 22:17:27] [INFO] Departments page loaded
+[2026-05-22 22:17:27] [ERROR] Database connection failed
+[2026-05-22 22:17:27] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:17:27"}
+[2026-05-22 22:17:27] [CACHE] CACHE HIT: department_list | {"key":"department_list__1_18"}
+[2026-05-22 22:17:27] [SQL] SELECT * FROM tblDepartments WHERE department_id = ? | [10]
+[2026-05-22 22:17:28] [INFO] Employees page loaded
+[2026-05-22 22:17:28] [ERROR] Database connection failed
+[2026-05-22 22:17:28] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:17:28"}
+[2026-05-22 22:17:28] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:17:28] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 22:17:34] [INFO] Employees page loaded
+[2026-05-22 22:17:34] [ERROR] Database connection failed
+[2026-05-22 22:17:34] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:17:34"}
+[2026-05-22 22:17:34] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:17:34] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]
+[2026-05-22 22:17:44] [INFO] Employees page loaded
+[2026-05-22 22:17:44] [ERROR] Database connection failed
+[2026-05-22 22:17:44] [SECURITY] Failed login attempt | {"user":1,"ip":"::1","agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/148.0.0.0 Safari\/537.36","time":"22:17:44"}
+[2026-05-22 22:17:44] [CACHE] CACHE HIT: employees_list | {"key":"employees_list__1_18"}
+[2026-05-22 22:17:44] [SQL] SELECT * FROM tblEmployees WHERE id = ? | [10]

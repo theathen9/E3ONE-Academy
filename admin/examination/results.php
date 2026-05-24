@@ -35,44 +35,67 @@
     $routeAdmin[5]["active"] = true;
     $routeAdmin[5]['submenu'][1]['active'] = true;
 
-
-    $selectedTeacher = $_GET['teacher'] ?? '';
-    $selectedClass   = $_GET['class'] ?? '';
-    $academicYear = $_GET['academic_year'] ?? '';
-
-    $selectedExamType = $_GET['exam_type'] ?? '';
-
-
-
-
-
     $db = new DB($conn);
     $teacherCRUD = new ORM($db, 'tblEmployees t', 'employee_id');
     $ClassesCRUD = new ORM($db, 'tblClasses', 'class_id');
     $StudentsCRUD = new ORM($db, 'tblStudents s', 'student_id');
-    $ScoresCRUD = new ORM($db, 'tblScores', 'score_id');
+    $ScoresCRUD = new ORM($db, 'tblScores sc', 'score_id');
     $scoreTypesCRUD = new ORM($db, 'tblScoreTypes', 'score_type_id');
-    $resultStudentCRUD = new ORM($db, 'tblStudentResults', 'result_id');
+    $resultStudentCRUD = new ORM($db, 'tblStudentResults r', 'result_id');
 
-    $scoreTypes = $scoreTypesCRUD->select("*")->get();
-
-    $studentsScores = $ScoresCRUD
-        ->select("student_id, class_id, score_type_id, score")
-        ->where("academic_year", "=", $academicYear)
-        ->get();
-
-    $scoreMap = [];
-
-    foreach ($studentsScores as $score) {
-
-        $scoreMap[$score['student_id']][$score['score_type_id']] =
-            (float) $score['score'];
-    }
+    $selectedTeacher = $_GET['teacher'] ?? '';
+    $selectedClass   = $_GET['class'] ?? '';
+    $academicYear    = $_GET['academic_year'] ?? '';
+    $selectedExamType = $_GET['exam_type'] ?? '';
 
     $years = $conn->query("
     SELECT DISTINCT academic_year
     FROM tblClasses
     ORDER BY academic_year DESC");
+
+    $students = [];
+
+    if ($selectedClass && $academicYear) {
+
+        $students = $StudentsCRUD
+            ->select("
+        s.student_id,
+        e.enrollment_id,
+        CONCAT(s.first_name_kh, ' ', s.last_name_kh) AS name,
+        c.class_name AS class
+    ")
+            ->join("tblEnrollments e", "e.student_id = s.student_id")
+            ->join("tblClasses c", "c.class_id = e.class_id")
+            ->where("e.class_id", "=", $selectedClass) // ✅ FIX HERE
+            ->get();
+    }
+
+    $scoreTypes = $scoreTypesCRUD->select("*")->get();
+
+    $studentsScores = $ScoresCRUD
+        ->select("
+        sc.enrollment_id,
+        sc.score_type_id,
+        sc.score
+    ")
+        ->join('tblEnrollments e', 'sc.enrollment_id = e.enrollment_id')
+        ->join('tblClasses cl', 'e.class_id = cl.class_id');
+
+    if (!empty($academicYear)) {
+        $studentsScores->where("SUBSTRING_INDEX(cl.academic_year, '-', -1)", "=", $academicYear);
+    }
+
+    $studentsScores = $studentsScores->get();
+
+    $scoreMap = [];
+
+    foreach ($studentsScores as $score) {
+
+        $scoreMap[$score['enrollment_id']][$score['score_type_id']] =
+            (float) $score['score'];
+    }
+
+
 
     $teachers = $teacherCRUD
         ->select("
@@ -101,21 +124,71 @@
     $classes = $classQuery->get();
 
 
-    $students = [];
+
+    $results = [];
 
     if ($selectedClass && $academicYear) {
 
-        $students = $StudentsCRUD
+        $results = $resultStudentCRUD
             ->select("
+            r.result_id,
+            r.enrollment_id,
+            r.total_score,
+            r.average_score,
+            r.grade_id,
+            r.class_id,
+
             s.student_id,
-            CONCAT(s.first_name_kh, ' ', s.last_name_kh) AS name,
-            c.class_name AS class
+            CONCAT(s.first_name_kh, ' ', s.last_name_kh) AS student_name,
+            c.class_name
         ")
-            ->join("tblEnrollments e", "e.student_id = s.student_id")
-            ->join("tblClasses c", "c.class_id = e.class_id")
-            ->where("c.class_id", "=", $selectedClass)
+            ->join("tblEnrollments e", "e.enrollment_id = r.enrollment_id")
+            ->join("tblStudents s", "s.student_id = e.student_id")
+            ->join("tblClasses c", "c.class_id = r.class_id")
+            ->where("r.class_id", "=", $selectedClass)
             ->get();
     }
+
+    $scores = $ScoresCRUD
+        ->select("
+        sc.enrollment_id,
+        sc.score_type_id,
+        sc.score
+    ")
+        ->join("tblEnrollments e", "e.enrollment_id = sc.enrollment_id")
+        ->join("tblClasses c", "c.class_id = e.class_id")
+        ->where("c.class_id", "=", $selectedClass)
+        ->get();
+
+
+    $scoreMap = [];
+
+    foreach ($scores as $row) {
+        $scoreMap[$row['enrollment_id']][$row['score_type_id']] = (float)$row['score'];
+    }
+
+
+    /**
+     * =========================
+     * HELPER: GRADE MAP
+     * =========================
+     */
+    function getGradeLabel($gradeId)
+    {
+        return match ($gradeId) {
+            1 => 'A',
+            2 => 'B',
+            3 => 'C',
+            4 => 'D',
+            default => 'F'
+        };
+    }
+
+    function getStatus($score)
+    {
+        return $score >= 50 ? ['Pass', 'success'] : ['Fail', 'danger'];
+    }
+
 
     ?>
     <!DOCTYPE html>
@@ -230,7 +303,7 @@
 
             <!-- Main area -->
             <main class="col-10 bg-light">
-               <div
+                <div
                     class="d-flex justify-content-between align-items-center px-2 py-2 bg-white position-sticky top-0 z-3">
                     <div class="title">Welcome to <?php echo $infoSchemaData[0]["name"] ?></div>
 
@@ -310,11 +383,10 @@
                                                             name="academic_year"
                                                             class="form-control"
                                                             placeholder="e.g. 2023-2024 or 2024"
+                                                            value="<?= htmlspecialchars($academicYear ?? '') ?>"
                                                             required
-                                                            value="<?= htmlspecialchars($academicYear) ?>">
-
+                                                            onchange="this.form.submit()">
                                                     </div>
-
                                                     <div class="col-md-3">
                                                         <label class="form-label">Class</label>
 
@@ -355,7 +427,6 @@
                                     </form>
 
 
-
                                     <!-- Table -->
                                     <div class="card shadow-sm border-0">
 
@@ -385,80 +456,55 @@
 
                                                         <tbody>
 
-                                                            <?php foreach ($students as $student): ?>
+                                                            <?php if (empty($results)): ?>
+                                                                <tr>
+                                                                    <td colspan="11" class="text-center text-muted p-4">
+                                                                        No results found
+                                                                    </td>
+                                                                </tr>
+                                                            <?php endif; ?>
+
+                                                            <?php foreach ($results as $i => $r): ?>
+
+                                                                <?php
+                                                                [$statusText, $badge] = getStatus($r['average_score']);
+                                                                $grade = getGradeLabel($r['grade_id']);
+
+                                                                $enrollmentId = $r['enrollment_id'];
+
+                                                                $speaking  = $scoreMap[$enrollmentId][1] ?? 0;
+                                                                $listening = $scoreMap[$enrollmentId][2] ?? 0;
+                                                                $reading   = $scoreMap[$enrollmentId][3] ?? 0;
+                                                                $grammar   = $scoreMap[$enrollmentId][4] ?? 0;
+                                                                $writing   = $scoreMap[$enrollmentId][5] ?? 0;
+                                                                ?>
 
                                                                 <tr>
+                                                                    <td><?= $i + 1 ?></td>
+                                                                    <td><?= htmlspecialchars($r['student_name']) ?></td>
+                                                                    <td><?= htmlspecialchars($r['class_name']) ?></td>
 
-                                                                    <td><?= $student['student_id'] ?></td>
-                                                                    <td><?= htmlspecialchars($student['name']) ?></td>
-                                                                    <td><?= htmlspecialchars($student['class']) ?></td>
-
-                                                                    <?php
-                                                                    // 1. calculate total first
-                                                                    $total = 0;
-                                                                    $subjectCount = count($scoreTypes);
-                                                                    $maxScorePerSubject = 100;
-
-                                                                    foreach ($scoreTypes as $type) {
-
-                                                                        $score = $scoreMap[$student['student_id']][$type['score_type_id']] ?? 0;
-
-                                                                        $total += (float) $score;
-                                                                    }
-
-
-                                                                    $percent = $total;
-
-                                                                    $grade = match (true) {
-                                                                        $percent >= 90 => 'A',
-                                                                        $percent >= 80 => 'B',
-                                                                        $percent >= 70 => 'C',
-                                                                        $percent >= 60 => 'D',
-                                                                        default => 'F'
-                                                                    };
-
-                                                                    $status = $percent >= 50 ? 'Pass' : 'Fail';
-                                                                    $badge  = $percent >= 50 ? 'success' : 'danger';
-
-                                                                    ?>
-
-                                                                    <!-- SCORE INPUTS -->
-                                                                    <?php foreach ($scoreTypes as $type): ?>
-                                                                        <td>
-                                                                            <input
-                                                                                type="number"
-                                                                                name="scores[<?= $type['score_type_id'] ?>][<?= $student['student_id'] ?>]"
-                                                                                class="form-control score-input"
-                                                                                min="0"
-                                                                                max="50"
-                                                                                readonly
-                                                                                value="<?= $scoreMap[$student['student_id']][$type['score_type_id']] ?? 0 ?>">
-                                                                        </td>
-                                                                    <?php endforeach; ?>
+                                                                    <!-- SCORES -->
+                                                                    <td><?= $speaking ?></td>
+                                                                    <td><?= $listening ?></td>
+                                                                    <td><?= $reading ?></td>
+                                                                    <td><?= $grammar ?></td>
+                                                                    <td><?= $writing ?></td>
 
                                                                     <!-- TOTAL -->
-                                                                    <td>
-                                                                        <input
-                                                                            type="number"
-                                                                            class="form-control total-score"
-                                                                            value="<?= $total ?>"
-                                                                            readonly>
-                                                                    </td>
+                                                                    <td><?= $r['total_score'] ?></td>
 
                                                                     <!-- GRADE -->
                                                                     <td>
-                                                                        <span class="badge bg-dark">
-                                                                            <?= $grade ?>
-                                                                        </span>
+                                                                        <span class="badge bg-dark"><?= $grade ?></span>
                                                                     </td>
 
                                                                     <!-- STATUS -->
                                                                     <td>
                                                                         <span class="badge bg-<?= $badge ?>">
-                                                                            <?= $status ?>
+                                                                            <?= $statusText ?>
                                                                         </span>
                                                                     </td>
-
                                                                 </tr>
 
                                                             <?php endforeach; ?>
@@ -491,43 +537,7 @@
                     </div>
             </main>
         </div>
-        <script src="../../script.js"></script>
 
-        <script>
-            document.querySelectorAll("tbody tr").forEach(row => {
-
-                // dynamic score inputs
-                const scoreInputs = row.querySelectorAll(".score-input");
-
-                // total field
-                const totalInput = row.querySelector(".total-score");
-
-                function calculateTotal() {
-
-                    let total = 0;
-
-                    scoreInputs.forEach(input => {
-
-                        total += Number(input.value || 0);
-
-                    });
-
-                    if (totalInput) {
-                        totalInput.value = total;
-                    }
-                }
-
-                // auto calculate on typing
-                scoreInputs.forEach(input => {
-
-                    input.addEventListener("input", calculateTotal);
-
-                });
-
-                // first load
-                calculateTotal();
-            });
-        </script>
 
     </body>
 

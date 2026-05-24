@@ -288,9 +288,6 @@ CREATE TABLE tblEnrollments (
 );
 
 
-ALTER TABLE tblEnrollments
-ADD COLUMN status ENUM('draft','active','cancelled')
-DEFAULT 'draft';
 
 
 CREATE TABLE tblGrade (
@@ -345,11 +342,13 @@ CREATE TABLE tblStudentResults (
     result_id INT AUTO_INCREMENT PRIMARY KEY,
 
     enrollment_id INT NOT NULL,
+    class_id INT NOT NULL,
+    academic_year VARCHAR(20) NOT NULL,
 
-    total_score DECIMAL(6,2),
-    average_score DECIMAL(5,2),
+    total_score DECIMAL(6,2) DEFAULT 0,
+    average_score DECIMAL(5,2) DEFAULT 0,
 
-    grade_id INT,
+    grade_id INT NULL,
 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
@@ -357,11 +356,14 @@ CREATE TABLE tblStudentResults (
         REFERENCES tblEnrollments(enrollment_id)
         ON DELETE CASCADE,
 
+    FOREIGN KEY (class_id)
+        REFERENCES tblClasses(class_id)
+        ON DELETE CASCADE,
+
     FOREIGN KEY (grade_id)
         REFERENCES tblGrade(grade_id)
         ON DELETE SET NULL
 );
-
 
 
 CREATE TABLE tblAttendances (
@@ -377,8 +379,8 @@ CREATE TABLE tblAttendances (
      created_by INT NULL,
 
     FOREIGN KEY (enrollment_id) REFERENCES tblEnrollments(enrollment_id) ON DELETE CASCADE,
-     FOREIGN KEY (created_by) REFERENCES tblemployees(employee_id) ON DELETE CASCADE,
-    UNIQUE(enrollment_id, attendance_date, created_by)
+     FOREIGN KEY (created_by) REFERENCES tblEmployees(employee_id) ON DELETE CASCADE,
+    UNIQUE(enrollment_id, attendance_date)
 );
 
 
@@ -390,7 +392,7 @@ CREATE TABLE tblInvoices (
 
     invoice_date DATE NOT NULL,
     total_amount DECIMAL(10,2) NOT NULL CHECK (total_amount >= 0),
-    discount DECIMAL(10,2) NULL,
+    discount DECIMAL(10,2) DEFAULT 0,
     
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     created_by INT NOT NULL ,
@@ -424,7 +426,7 @@ CREATE TABLE tblPayments (
 	
     FOREIGN KEY (invoice_id) REFERENCES tblInvoices(invoice_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES tblEmployees(employee_id),
-    FOREIGN KEY (payment_method_id) REFERENCES tblpaymentmethods(method_id)
+    FOREIGN KEY (payment_method_id) REFERENCES tblPaymentMethods(method_id)
 );
 
 CREATE TABLE tblInvoiceItems (

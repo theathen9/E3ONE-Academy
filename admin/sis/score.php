@@ -146,7 +146,7 @@ $totalPages = ceil($totalEmployees / $limit);
     <div class="row g-3">
 
         <?php Navbar($infoSchemaData, $routeAdmin); ?>
-       
+
 
         <!-- Main area -->
         <main class="col-lg-10 col-sm-12 bg-light">
@@ -257,13 +257,13 @@ background: linear-gradient(139deg, rgba(0, 109, 156, 1) 32%, rgba(0, 109, 156, 
                                                         ? htmlspecialchars($row['first_name_kh']) . ' ' . htmlspecialchars($row['last_name_kh'])
                                                         : 'N/A' ?>
                                                 </td>
-                                                
+
                                                 <td>
                                                     <?= !empty($row['first_name_en'] && $row['last_name_en'])
                                                         ? htmlspecialchars($row['first_name_en']) . ' ' . htmlspecialchars($row['last_name_en'])
                                                         : 'N/A' ?>
                                                 </td>
-                                                
+
                                                 <td><?= htmlspecialchars($row['gender'] ?? 'N/A') ?></td>
                                                 <td><?= htmlspecialchars($row['dob'] ?? 'N/A') ?></td>
                                                 <td>
@@ -274,7 +274,7 @@ background: linear-gradient(139deg, rgba(0, 109, 156, 1) 32%, rgba(0, 109, 156, 
                                                 </td>
                                                 <td>
                                                     <?= !empty($row['curr_addr_village'] && $row['curr_addr_village'])
-                                                        ? htmlspecialchars($row['curr_addr_village']) . ', ' . htmlspecialchars($row['curr_addr_commune']). ', ' . htmlspecialchars($row['curr_addr_province'])
+                                                        ? htmlspecialchars($row['curr_addr_village']) . ', ' . htmlspecialchars($row['curr_addr_commune']) . ', ' . htmlspecialchars($row['curr_addr_province'])
                                                         : 'N/A' ?>
                                                 </td>
                                             </tr>
@@ -346,6 +346,24 @@ background: linear-gradient(139deg, rgba(0, 109, 156, 1) 32%, rgba(0, 109, 156, 
         });
     </script>
     <script>
+        fetch("http://localhost/system-management/api/v1/users.php", {
+                credentials: "include"
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelector("#username").innerText = data.data.username;
+
+                    const profileImg = data.data.profile_image ?
+                        "/system-management/uploads/photos/" + data.data.profile_image :
+                        "/system-management/src/assets/default-user.png";
+
+                    document.querySelector("#profileImg").src = profileImg;
+                } else {
+                    console.log("Failed:", data);
+                }
+            });
+
         let selectedId = null;
 
         const tableBody = document.getElementById("studentTable");

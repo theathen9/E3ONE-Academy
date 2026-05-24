@@ -55,11 +55,11 @@ $routeAdmin = [
                 "link"   => BASE_URL . "/admin/sis/student",
                 "active" => false
             ],
-            [
-                "title"  => "Rooms",
-                "link"   => BASE_URL . "/admin/sis/rooms",
-                "active" => false
-            ],
+            // [
+            //     "title"  => "Rooms",
+            //     "link"   => BASE_URL . "/admin/sis/rooms",
+            //     "active" => false
+            // ],
             [
                 "title"  => "Courses",
                 "link"   => BASE_URL . "/admin/sis/courses",

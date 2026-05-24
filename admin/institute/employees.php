@@ -324,20 +324,22 @@ $log->sql("SELECT * FROM tblEmployees WHERE id = ?", [10]);
 
     <script>
         fetch("http://localhost/system-management/api/v1/users.php", {
-                credentials: "include"
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.querySelector("#username").innerText = data.data.username;
+                    credentials: "include"
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.querySelector("#username").innerText = data.data.username;
 
-                    document.querySelector("#profileImg").src =
-                        "http://localhost/system-management/uploads/photos/" +
-                        data.data.profile_image;
-                } else {
-                    console.log("Failed:", data);
-                }
-            });
+                        const profileImg = data.data.profile_image ?
+                            "/system-management/uploads/photos/" + data.data.profile_image :
+                            "/system-management/src/assets/default-user.png";
+
+                        document.querySelector("#profileImg").src = profileImg;
+                    } else {
+                        console.log("Failed:", data);
+                    }
+                });
 
 
         let selectedId = null;

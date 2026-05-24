@@ -36,43 +36,68 @@
     $routeAdmin[5]['submenu'][0]['active'] = true;
 
 
-    $selectedTeacher = $_GET['teacher'] ?? '';
-    $selectedClass   = $_GET['class'] ?? '';
-    $academicYear = $_GET['academic_year'] ?? '';
-
-    $selectedExamType = $_GET['exam_type'] ?? '';
-
-
-
-
-
     $db = new DB($conn);
     $teacherCRUD = new ORM($db, 'tblEmployees t', 'employee_id');
     $ClassesCRUD = new ORM($db, 'tblClasses', 'class_id');
     $StudentsCRUD = new ORM($db, 'tblStudents s', 'student_id');
-    $ScoresCRUD = new ORM($db, 'tblScores', 'score_id');
+    $ScoresCRUD = new ORM($db, 'tblScores sc', 'score_id');
     $scoreTypesCRUD = new ORM($db, 'tblScoreTypes', 'score_type_id');
     $resultStudentCRUD = new ORM($db, 'tblStudentResults', 'result_id');
 
-    $scoreTypes = $scoreTypesCRUD->select("*")->get();
 
-    $studentsScores = $ScoresCRUD
-        ->select("student_id, class_id, score_type_id, score")
-        ->where("academic_year", "=", $academicYear)
-        ->get();
-
-    $scoreMap = [];
-
-    foreach ($studentsScores as $score) {
-
-        $scoreMap[$score['student_id']][$score['score_type_id']] =
-            (float) $score['score'];
-    }
+    $selectedTeacher = $_GET['teacher'] ?? '';
+    $selectedClass   = $_GET['class'] ?? '';
+    $academicYear    = $_GET['academic_year'] ?? '';
+    $selectedExamType = $_GET['exam_type'] ?? '';
 
     $years = $conn->query("
     SELECT DISTINCT academic_year
     FROM tblClasses
     ORDER BY academic_year DESC");
+
+    $students = [];
+
+    if ($selectedClass && $academicYear) {
+
+        $students = $StudentsCRUD
+            ->select("
+        s.student_id,
+        e.enrollment_id,
+        CONCAT(s.first_name_kh, ' ', s.last_name_kh) AS name,
+        c.class_name AS class
+    ")
+            ->join("tblEnrollments e", "e.student_id = s.student_id")
+            ->join("tblClasses c", "c.class_id = e.class_id")
+            ->where("e.class_id", "=", $selectedClass) // ✅ FIX HERE
+            ->get();
+    }
+
+    $scoreTypes = $scoreTypesCRUD->select("*")->get();
+
+    $studentsScores = $ScoresCRUD
+        ->select("
+        sc.enrollment_id,
+        sc.score_type_id,
+        sc.score
+    ")
+        ->join('tblEnrollments e', 'sc.enrollment_id = e.enrollment_id')
+        ->join('tblClasses cl', 'e.class_id = cl.class_id');
+
+    if (!empty($academicYear)) {
+        $studentsScores->where("SUBSTRING_INDEX(cl.academic_year, '-', -1)", "=", $academicYear);
+    }
+
+    $studentsScores = $studentsScores->get();
+
+    $scoreMap = [];
+
+    foreach ($studentsScores as $score) {
+
+        $scoreMap[$score['enrollment_id']][$score['score_type_id']] =
+            (float) $score['score'];
+    }
+
+
 
     $teachers = $teacherCRUD
         ->select("
@@ -101,186 +126,62 @@
     $classes = $classQuery->get();
 
 
-    // $shouldLoad = !empty($selectedTeacher) && !empty($selectedClass) && !empty($academicYear);
+    // echo "<pre>";
+    // print_r($scoreMap);
+    // exit;
 
-    // $students = [];
-
-    // if ($shouldLoad) {
-
-    //     $students = $StudentsCRUD
-    //         ->select("
-    //         s.student_id,
-    //         CONCAT(s.first_name_kh, ' ', s.last_name_kh) AS name,
-    //         c.class_name AS class,
-
-    //         ts.score_type_id,
-    //         st.score_type_name,
-    //         ts.score
-    //     ")
-
-    //         ->join("tblEnrollments e", "e.student_id = s.student_id")
-
-    //         ->join("tblClasses c", "c.class_id = e.class_id")
-
-    //         ->join(
-    //             "tblScores ts",
-    //             "ts.student_id = s.student_id
-    //         AND ts.class_id = c.class_id
-    //         AND ts.academic_year = c.academic_year",
-    //             "LEFT"
-    //         )
-
-    //         ->join(
-    //             "tblScoreTypes st",
-    //             "st.score_type_id = ts.score_type_id",
-    //             "LEFT"
-    //         )
-
-    //         ->where("c.class_id", "=", $selectedClass)
-
-    //         ->where(
-    //             "SUBSTRING_INDEX(c.academic_year, '-', -1)",
-    //             "=",
-    //             $academicYear
-    //         )
-
-    //         ->get();
-
-
-    //     // reshape scores
-    //     $formattedStudents = [];
-
-    //     foreach ($students as $row) {
-
-    //         $studentId = $row['student_id'];
-
-    //         if (!isset($formattedStudents[$studentId])) {
-
-    //             $formattedStudents[$studentId] = [
-    //                 'student_id' => $row['student_id'],
-    //                 'name'       => $row['name'],
-    //                 'class'      => $row['class'],
-    //                 'scores'     => []
-    //             ];
-    //         }
-
-    //         if (!empty($row['score_type_id'])) {
-
-    //             $formattedStudents[$studentId]['scores'][$row['score_type_id']] = $row['score'];
-    //         }
-    //     }
-
-    //     $students = array_values($formattedStudents);
-    // }
-
-    // $students = [];
-
-    $students = [];
-
-    if ($selectedClass && $academicYear) {
-
-        $students = $StudentsCRUD
-            ->select("
-            s.student_id,
-            CONCAT(s.first_name_kh, ' ', s.last_name_kh) AS name,
-            c.class_name AS class
-        ")
-            ->join("tblEnrollments e", "e.student_id = s.student_id")
-            ->join("tblClasses c", "c.class_id = e.class_id")
-            ->where("c.class_id", "=", $selectedClass)
-            ->get();
-    }
-
-    // if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    //     $classId = $selectedClass;
-
-    //     foreach ($_POST['scores'] as $scoreTypeId => $studentsScores) {
-
-    //         foreach ($studentsScores as $studentId => $scoreValue) {
-
-    //             $existing = $ScoresCRUD
-    //                 ->select("*")
-    //                 ->where("student_id", "=", $studentId)
-    //                 ->where("class_id", "=", $classId)
-    //                 ->where("score_type_id", "=", $scoreTypeId)
-    //                 ->where("academic_year", "=", $academicYear)
-    //                 ->where("semester", "=", $selectedExamType)
-    //                 ->first();
-
-    //             $data = [
-    //                 'student_id'     => $studentId,
-    //                 'class_id'       => $classId,
-    //                 'score_type_id'  => $scoreTypeId,
-    //                 'score'          => $scoreValue,
-    //                 'academic_year'  => $academicYear,
-    //                 'semester'       => $selectedExamType
-    //             ];
-
-    //             if ($existing) {
-
-    //                 $ScoresCRUD
-    //                     ->where("score_id", "=", $existing['score_id'])
-    //                     ->update($data);
-    //             } else {
-
-    //                 $ScoresCRUD->insert($data);
-    //             }
-    //         }
-    //     }
-    // }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         verifyCSRF();
 
+        $ScoresCRUD = new ORM($db, 'tblScores', 'score_id');
         $resultStudentCRUD = new ORM($db, 'tblStudentResults', 'result_id');
 
+        // =========================
+        // 1. UPSERT SCORES
+        // =========================
         foreach ($_POST['scores'] as $scoreTypeId => $studentsScores) {
 
-            foreach ($studentsScores as $studentId => $scoreValue) {
+            foreach ($studentsScores as $enrollmentId => $scoreValue) {
 
-                // 1. UPSERT SCORE
                 $data = [
-                    'student_id'    => $studentId,
-                    'class_id'      => $selectedClass,
-                    'score_type_id' => $scoreTypeId,
-                    'score'         => (float) $scoreValue,
-                    'academic_year' => $academicYear
+                    'enrollment_id'   => $enrollmentId,
+                    'score_type_id'   => $scoreTypeId,
+                    'score'           => (float) $scoreValue
                 ];
 
                 $existing = $ScoresCRUD
                     ->select("score_id")
-                    ->where("student_id", "=", $studentId)
-                    ->where("class_id", "=", $selectedClass)
+                    ->where("enrollment_id", "=", $enrollmentId)
                     ->where("score_type_id", "=", $scoreTypeId)
-                    ->where("academic_year", "=", $academicYear)
                     ->first();
 
                 if ($existing) {
-                    $ScoresCRUD->where("score_id", "=", $existing['score_id'])->update($data);
+                    $ScoresCRUD
+                        ->where("score_id", "=", $existing['score_id'])
+                        ->update($data);
                 } else {
                     $ScoresCRUD->insert($data);
                 }
-
-                // ❗ AFTER ALL SCORES, calculate result per student (do once, not per subject ideally)
             }
         }
 
         // =========================
-        // 2. BUILD RESULTS (PER STUDENT)
+        // 2. GET ALL ENROLLMENTS (IMPORTANT FIX)
         // =========================
-
-        $resultStudents = $ScoresCRUD
-            ->select("student_id")
-            ->where("class_id", "=", $selectedClass)
-            ->where("academic_year", "=", $academicYear)
-            ->groupBy("student_id")
+        $enrollments = $StudentsCRUD
+            ->select("e.enrollment_id")
+            ->join("tblEnrollments e", "e.student_id = s.student_id")
+            ->where("e.class_id", "=", $selectedClass)
             ->get();
 
-        foreach ($students as $stu) {
+        // =========================
+        // 3. BUILD RESULTS PER STUDENT
+        // =========================
+        foreach ($enrollments as $enroll) {
 
-            $studentId = $stu['student_id'];
+            $enrollmentId = $enroll['enrollment_id'];
 
             $total = 0;
 
@@ -288,38 +189,36 @@
 
                 $row = $ScoresCRUD
                     ->select("score")
-                    ->where("student_id", "=", $studentId)
-                    ->where("class_id", "=", $selectedClass)
+                    ->where("enrollment_id", "=", $enrollmentId)
                     ->where("score_type_id", "=", $type['score_type_id'])
-                    ->where("academic_year", "=", $academicYear)
                     ->first();
 
                 $total += (float) ($row['score'] ?? 0);
             }
 
-            $percent = (float) $total;
+            $average = $total; // (you can divide later if needed)
 
-            // grade
-            if ($percent >= 90) $gradeId = 1;
-            elseif ($percent >= 80) $gradeId = 2;
-            elseif ($percent >= 70) $gradeId = 3;
-            elseif ($percent >= 60) $gradeId = 4;
+            // =========================
+            // GRADE LOGIC
+            // =========================
+            if ($average >= 90) $gradeId = 1;
+            elseif ($average >= 80) $gradeId = 2;
+            elseif ($average >= 70) $gradeId = 3;
+            elseif ($average >= 60) $gradeId = 4;
             else $gradeId = 5;
 
             $resultData = [
-                'student_id'    => $studentId,
-                'class_id'      => $selectedClass,
-                'academic_year' => $academicYear,
-                'total_score'   => $total,
-                'average_score' => $percent,
-                'grade_id'      => $gradeId
+                'enrollment_id' => $enrollmentId,
+                'class_id'       => $selectedClass,
+                'academic_year'  => $academicYear,
+                'total_score'    => $total,
+                'average_score'  => $average,
+                'grade_id'       => $gradeId
             ];
 
             $existingResult = $resultStudentCRUD
                 ->select("result_id")
-                ->where("student_id", "=", $studentId)
-                ->where("class_id", "=", $selectedClass)
-                ->where("academic_year", "=", $academicYear)
+                ->where("enrollment_id", "=", $enrollmentId)
                 ->first();
 
             if ($existingResult) {
@@ -330,6 +229,8 @@
                 $resultStudentCRUD->insert($resultData);
             }
         }
+        header("Location: add.php?class=$selectedClass&academic_year=$academicYear&teacher=$selectedTeacher&exam_type=$selectedExamType");
+        exit;
     }
 
     ?>
@@ -525,11 +426,10 @@
                                                             name="academic_year"
                                                             class="form-control"
                                                             placeholder="e.g. 2023-2024 or 2024"
+                                                            value="<?= htmlspecialchars($academicYear ?? '') ?>"
                                                             required
-                                                            value="<?= htmlspecialchars($academicYear) ?>">
-
+                                                            onchange="this.form.submit()">
                                                     </div>
-
                                                     <div class="col-md-3">
                                                         <label class="form-label">Class</label>
 
@@ -630,13 +530,13 @@
 
                                                                             <input
                                                                                 type="number"
-                                                                                name="scores[<?= $type['score_type_id'] ?>][<?= $student['student_id'] ?>]"
+                                                                                name="scores[<?= $type['score_type_id'] ?>][<?= $student['enrollment_id'] ?>]"
                                                                                 class="form-control score-input"
                                                                                 min="0"
                                                                                 max="100"
 
                                                                                 value="<?= htmlspecialchars(
-                                                                                            $scoreMap[$student['student_id']][$type['score_type_id']] ?? ''
+                                                                                            $scoreMap[$student['enrollment_id']][$type['score_type_id']] ?? ''
                                                                                         ) ?>">
 
                                                                         </td>
@@ -719,6 +619,20 @@
                 // first load
                 calculateTotal();
             });
+        </script>
+
+        <script>
+            async function loadClasses() {
+                const teacher = document.querySelector('[name="teacher"]').value;
+                const year = document.querySelector('[name="academic_year"]').value;
+                const classId = document.querySelector('[name="class"]').value;
+                const examType = document.querySelector('[name="exam_type"]').value;
+
+                const res = await fetch(`/system-management/app/api/v1/classes_by_teacher.php?teacher=${teacher}&academic_year=${year}&class=${classId}&exam_type=${examType}`);
+
+                const json = await res.json();
+                console.log(json);
+            }
         </script>
 
     </body>

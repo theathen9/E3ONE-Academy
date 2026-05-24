@@ -400,7 +400,7 @@
 
 
                                 <?php foreach ($cards as $c): ?>
-                                    <div class="col-md-3">
+                                    <div hidden class="col-md-3">
                                         <div class="card card-box">
                                             <div class="card-body d-flex justify-content-between align-items-center">
                                                 <div>

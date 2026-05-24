@@ -24,7 +24,7 @@ authorizeRole('admin');
 
 $routeAdmin[0]["active"] = false;
 $routeAdmin[2]["active"] = true;
-$routeAdmin[2]['submenu'][2]['active'] = true;
+$routeAdmin[2]['submenu'][1]['active'] = true;
 
 
 $limit = 18;
@@ -491,21 +491,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="../../script.js"></script>
 
     <script>
-        fetch("http://localhost/system-management/api/v1/users.php", {
-                credentials: "include"
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.querySelector("#username").innerText = data.data.username;
+         fetch("http://localhost/system-management/api/v1/users.php", {
+                    credentials: "include"
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.querySelector("#username").innerText = data.data.username;
 
-                    document.querySelector("#profileImg").src =
-                        "http://localhost/system-management/uploads/photos/" +
-                        data.data.profile_image;
-                } else {
-                    console.log("Failed:", data);
-                }
-            });
+                        const profileImg = data.data.profile_image ?
+                            "/system-management/uploads/photos/" + data.data.profile_image :
+                            "/system-management/src/assets/default-user.png";
+
+                        document.querySelector("#profileImg").src = profileImg;
+                    } else {
+                        console.log("Failed:", data);
+                    }
+                });
 
 
         let selectedRow = null;

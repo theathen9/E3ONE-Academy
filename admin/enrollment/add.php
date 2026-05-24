@@ -21,9 +21,6 @@ $roomCRUD = new ORM($db, "tblRooms", "room_id");
 
 
 
-
-
-
 // 3️⃣ Fetch courses for the dropdown
 $courses = $conn->query("SELECT * FROM tblCourses ORDER BY course_name ASC");
 
@@ -266,8 +263,8 @@ $courses = $conn->query("SELECT * FROM tblCourses ORDER BY course_name ASC");
                             <tbody id="enrollmentTable">
 
                                 <!--  -->
-                                <?php if ($result && $result->num_rows > 0): ?>
-                                    <?php while ($row = $result->fetch_assoc()): ?>
+                                <?php if (!empty($data)): ?>
+                                    <?php foreach($data as $key => $row): ?>
                                         <tr data-id="<?= $row['enrollment_id'] ?>"
                                             data-code="<?= htmlspecialchars($row['enrollment_code']) ?>"
                                             data-name="<?= htmlspecialchars($row['enrollment_name']) ?>"
@@ -288,7 +285,7 @@ $courses = $conn->query("SELECT * FROM tblCourses ORDER BY course_name ASC");
                                             </td>
 
                                         </tr>
-                                    <?php endwhile; ?>
+                                    <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
                                         <td colspan="9" class="text-center text-muted">No records found</td>

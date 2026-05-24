@@ -1,40 +1,28 @@
 <?php
-
 date_default_timezone_set('Asia/Phnom_Penh');
-
 include_once __DIR__ . '/../../../data/dataSchema.php';
 include_once __DIR__ . '/../../../config/bootstrap.php';
 include_once __DIR__ . '/../../../components/Navbar.php';
-
 $userId = checkAuth();
-
 if (!$userId) {
     header("Location: " . BASE_URL . "/auth/signin.php");
     exit;
 }
-
 authorizeRole('admin');
-
-
 $routeAdmin[0]["active"] = false;
 $routeAdmin[4]["active"] = true;
 $routeAdmin[4]['submenu'][1]['active'] = true;
-
 $db = new DB($conn);
 $cache = new Cache();
-
-
 $studentCRUD     = new ORM($db, "tblStudents s");
 $classCRUD       = new ORM($db, "tblClasses cl");
 $attendanceCRUD  = new ORM($db, "tblAttendances");
 $enrollmentCRUD  = new ORM($db, "tblEnrollments e");
-
 /*
 |--------------------------------------------------------------------------
 | PAGINATION
 |--------------------------------------------------------------------------
 */
-
 $limit  = 10;
 $page   = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $classId = isset($_GET['class_id'])
@@ -48,65 +36,27 @@ $getTeacher = $_SESSION['reference_id'] ?? 0;
 $teacherId = $getTeacher;
 $page   = max($page, 1);
 $offset = ($page - 1) * $limit;
-$search = isset($_GET['search'])
-    ? trim($_GET['search'])
-    : '';
-
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
 /*
 |--------------------------------------------------------------------------
 | CACHE KEY
 |--------------------------------------------------------------------------
 */
-
 $cacheKey = "attendance_list_{$search}_{$page}_{$limit}";
 
 $students = $cache->get($cacheKey, 120);
-
 if ($students === null) {
 
     $studentsORM = $enrollmentCRUD
-
-        ->join("tblStudents s", "e.student_id = s.student_id")
-
-        ->join("tblClasses cl", "e.class_id = cl.class_id")
-        ->join(
-            "tblAttendances a",
-            "a.enrollment_id = e.enrollment_id 
-     AND a.attendance_date = '" . date('Y-m-d') . "'",
-            "LEFT"
-        )
-
-        ->select("
-            e.enrollment_id,
-
-            s.student_id,
-            s.first_name_kh,
-            s.last_name_kh,
-
-            cl.class_id,
-            cl.class_name,
-            cl.class_code,
-
-            a.attendance_id,
-            a.status AS attendance_status,
-            a.remarks AS attendance_remarks
-        ");
+        ->select("e.enrollment_id, s.student_id,s.first_name_kh,s.last_name_kh,cl.class_id,cl.class_name,cl.class_code,a.attendance_id,
+    a.status AS attendance_status,a.remarks AS attendance_remarks")
+        ->join("tblStudents s", "e.student_id = s.student_id")->join("tblClasses cl", "e.class_id = cl.class_id")
+        ->join("tblAttendances a", "a.enrollment_id = e.enrollment_id AND a.attendance_date = '" . date('Y-m-d') . "'", "LEFT");
 
     if ($classId > 0) {
-
-        $studentsORM->where(
-            "cl.class_id",
-            "=",
-            $classId
-        );
+        $studentsORM->where("cl.class_id", "=", $classId);
     }
-
-    $students = $studentsORM
-
-        ->orderBy("s.student_id", "ASC")
-
-        ->get();
-
+    $students = $studentsORM->orderBy("s.student_id", "ASC")->get();
     $cache->set($cacheKey, $students, 120);
     $cache->clearByPrefix("attendance_list_");
     $cache->clearByPrefix("students_class_");
@@ -154,20 +104,8 @@ $totalPages = ceil($totalAttendances / $limit);
 */
 
 $activeClasses = $classCRUD
-
-    ->join("tblTimeSlots ts", "cl.class_id = ts.slot_id")
-
-    ->select("
-        cl.class_id,
-        cl.class_name,
-        cl.class_code,
-        ts.slot_name as time
-    ")
-
-    ->where("cl.status", "=", "Active")
-
-    ->orderBy("cl.class_name", "ASC")
-
+    ->select("cl.class_id,cl.class_name,cl.class_code,ts.slot_name as time")
+    ->join("tblTimeSlots ts", "cl.slot_id = ts.slot_id")
     ->get();
 
 $error = false;
@@ -462,10 +400,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                             <!-- Footer Actions -->
                             <div class="alert text-center alert-danger <?= !$error ? 'd-none' : ''; ?>">
-                                <?= $error = "Cannot Resubmit Attendance" ?>
+                                Cannot Resubmit Attendance
                             </div>
+
                             <div class="alert text-center alert-success <?= !$success ? 'd-none' : ''; ?>">
-                                <?= $success = "Attendance submitted successfully!" ?>
+                                Attendance submitted successfully!
                             </div>
 
                             <div class="d-flex justify-content-end gap-2 mt-4 mb-5">
