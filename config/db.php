@@ -1,12 +1,13 @@
 <?php
 // ./config/db.php
 // Database credentials (replace with your actual values)
-$servername = "localhost";   // Hosting mySQL
-$username   = "root";        // Your DB username
+$servername = "dpg-d89g5db7uimc739j69og-a";   // Hosting mySQL
+$username   = "dbacademy_aa3x_user";        // Your DB username
 $password   = "";            // Your DB password
-$db         = "systemacademy";   // Your DB name
+$db         = "dbacademy_aa3x";   // Your DB name
+$port       = 5432;
 // Create connection
-$conn = new mysqli($servername, $username, $password, $db);
+$conn = new mysqli($servername, $username, $password, $db, (int)$port);
 
 // Check connection
 if ($conn->connect_error) {
