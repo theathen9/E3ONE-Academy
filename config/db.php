@@ -1,18 +1,27 @@
 <?php
 // ./config/db.php
-// Database credentials (replace with your actual values)
-$servername = "dpg-d89g5db7uimc739j69og-a";   // Hosting mySQL
-$username   = "dbacademy_aa3x_user";        // Your DB username
-$password   = "TFTh0EuIhlm2V1WznA5EKwM8iMDjHL52";            // Your DB password
-$db         = "dbacademy_aa3x";   // Your DB name
-$port       = 5432;
-// Create connection
-$conn = new mysqli($servername, $username, $password, $db, $port);
 
-// Check connection
-if ($conn->connect_error) {
-    die("❌ Database connection failed: " . $conn->connect_error);
+$host = getenv('DB_HOST');
+$dbname = getenv('DB_NAME');
+$username = getenv('DB_USER');
+$password = getenv('DB_PASSWORD');
+$port = getenv('DB_PORT') ?: 5432;
+
+try {
+    $conn = new PDO(
+        "pgsql:host=$host;port=$port;dbname=$dbname",
+        $username,
+        $password
+    );
+
+    $conn->setAttribute(
+        PDO::ATTR_ERRMODE,
+        PDO::ERRMODE_EXCEPTION
+    );
+
+    // optional
+    $conn->exec("SET NAMES 'UTF8'");
+
+} catch (PDOException $e) {
+    die("❌ Connection failed: " . $e->getMessage());
 }
-
-// Optional: Set charset to UTF-8 (recommended)
-$conn->set_charset("utf8");
