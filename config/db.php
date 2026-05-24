@@ -3,7 +3,7 @@
 // Database credentials (replace with your actual values)
 $servername = "dpg-d89g5db7uimc739j69og-a";   // Hosting mySQL
 $username   = "dbacademy_aa3x_user";        // Your DB username
-$password   = "";            // Your DB password
+$password   = "TFTh0EuIhlm2V1WznA5EKwM8iMDjHL52";            // Your DB password
 $db         = "dbacademy_aa3x";   // Your DB name
 $port       = 5432;
 // Create connection
