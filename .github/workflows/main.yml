@@ -1,0 +1,27 @@
+name: PHP CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Validate PHP files
+        run: find . -name "*.php" -print0 | xargs -0 -n1 php -l
+
+      - name: Install Composer Dependencies
+        run: composer install --no-interaction --prefer-dist
