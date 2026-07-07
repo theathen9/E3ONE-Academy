@@ -364,26 +364,27 @@ $datePicker = date('M d, Y', strtotime($startDate)) . ' — ' . date('M d, Y', s
                         <div class="row g-4">
                             <?php
 
-                            // Students all 
-                            $getStudentCard = "SELECT COUNT(*) as total FROM tblStudents";
-                            $studentCard = $conn->query($getStudentCard)->fetch_assoc()['total'];
+                           // Students all
+$getStudentCard = "SELECT COUNT(*) AS total FROM tblStudents";
+$studentCard = $conn->query($getStudentCard)->fetch(PDO::FETCH_ASSOC)['total'];
 
-                            // Teacher all 
-                            // $getTeacherCard = "SELECT COUNT(*) as total FROM tblEmployees where department_id = 4";
-                            $getTeacherCard = "SELECT COUNT(*) as total FROM tblEmployees e JOIN tblDepartments d ON e.department_id = d.department_id WHERE d.department_name = 'Teacher'";
-                            $teacherCard = $conn->query($getTeacherCard)->fetch_assoc()['total'];
+// Teachers all
+$getTeacherCard = "
+    SELECT COUNT(*) AS total
+    FROM tblEmployees e
+    JOIN tblDepartments d
+        ON e.department_id = d.department_id
+    WHERE d.department_name = 'Teacher'
+";
+$teacherCard = $conn->query($getTeacherCard)->fetch(PDO::FETCH_ASSOC)['total'];
 
-                            // Students all 
-                            $getStudentCard = "SELECT COUNT(*) as total FROM tblStudents";
-                            $studentCard = $conn->query($getStudentCard)->fetch_assoc()['total'];
+// Classes all
+$getClassCard = "SELECT COUNT(*) AS total FROM tblClasses";
+$classCard = $conn->query($getClassCard)->fetch(PDO::FETCH_ASSOC)['total'];
 
-                            // Classes all 
-                            $getClassCard = "SELECT COUNT(*) as total FROM tblClasses";
-                            $classCard = $conn->query($getClassCard)->fetch_assoc()['total'];
-
-                            // Revenue all 
-                            $getRevenueCard = "SELECT SUM(amount) as total FROM tblPayments";
-                            $revenueCard = $conn->query($getRevenueCard)->fetch_assoc()['total'];
+// Revenue all
+$getRevenueCard = "SELECT COALESCE(SUM(amount), 0) AS total FROM tblPayments";
+$revenueCard = $conn->query($getRevenueCard)->fetch(PDO::FETCH_ASSOC)['total'];
 
                             $cards = [
                                 ["Total Revenue", "totalRevenueCard", "fa-dollar-sign", "bg-green", "$" . number_format($revenueCard, 2)],
