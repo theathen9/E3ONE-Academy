@@ -3,11 +3,11 @@
 // header("Cache-Control: no-cache, no-store, must-revalidate");
 // header("Pragma: no-cache");
 // header("Expires: 0");
+include_once __DIR__ . '/../../../config/bootstrap.php';
 header('Content-Type: application/json');
 
 date_default_timezone_set('Asia/Phnom_Penh');
 
-include_once __DIR__ . '/../../../config/bootstrap.php';
 
 /* =========================
    AUTH
