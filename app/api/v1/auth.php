@@ -1,8 +1,8 @@
 <?php
+require_once __DIR__ . "/../../config/bootstrap.php";
 // ./app/api/v1/auth.php
 // header('Content-Type: application/json');
 
-require_once __DIR__ . "/../../config/bootstrap.php";
 
 
 // use mysqli for database interactions instead of PDO to maintain compatibility with existing code.
