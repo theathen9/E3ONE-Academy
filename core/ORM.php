@@ -11,7 +11,7 @@ class ORM
     private $orWhere = [];
     private $rawWhere = [];
     private $params = [];
-    private $types = "";
+    // private $types = "";
     private $order = "";
     private $group = "";
     private $limit = "";
@@ -28,36 +28,211 @@ class ORM
         $this->primaryKey = $primaryKey;
     }
 
+    // ========================
+    // Conditional Methods
+    // ========================
+    private function allowedOperator($operator)
+    {
+        $allowed = [
+            '=',
+            '!=',
+            '<>',
+            '>',
+            '<',
+            '>=',
+            '<=',
+            'LIKE',
+            'ILIKE',   // PostgreSQL case-insensitive LIKE
+            'IN',
+            'NOT IN',
+            'IS',
+            'IS NOT'
+        ];
+
+        $operator = strtoupper($operator);
+
+        if (!in_array($operator, $allowed, true)) {
+            throw new InvalidArgumentException("Invalid operator: {$operator}");
+        }
+
+        return $operator;
+    }
+
+    private function loadBelongsTo(array $rows, string $relationName, array $relation)
+    {
+        $foreignKey = $relation['foreignKey'];
+        $ownerKey   = $relation['ownerKey'];
+
+        $ids = array_unique(array_column($rows, $foreignKey));
+
+        if (empty($ids)) {
+            return $rows;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+        $sql = "SELECT * FROM {$relation['table']}
+            WHERE {$ownerKey} IN ($placeholders)";
+
+        $records = $this->db->select($sql, $ids);
+
+        $map = [];
+
+        foreach ($records as $record) {
+            $map[$record[$ownerKey]] = $record;
+        }
+
+        foreach ($rows as &$row) {
+            $row[$relationName] = $map[$row[$foreignKey]] ?? null;
+        }
+
+        return $rows;
+    }
+
+    private function loadHasMany(array $rows, string $relationName, array $relation)
+    {
+        $localKey   = $relation['localKey'];
+        $foreignKey = $relation['foreignKey'];
+
+        $ids = array_unique(array_column($rows, $localKey));
+
+        if (empty($ids)) {
+            return $rows;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+        $sql = "SELECT *
+            FROM {$relation['table']}
+            WHERE {$foreignKey} IN ($placeholders)";
+
+        $records = $this->db->select($sql, $ids);
+
+        $grouped = [];
+
+        foreach ($records as $record) {
+            $grouped[$record[$foreignKey]][] = $record;
+        }
+
+        foreach ($rows as &$row) {
+            $row[$relationName] = $grouped[$row[$localKey]] ?? [];
+        }
+
+        return $rows;
+    }
+
+    private function loadHasOne(array $rows, string $relationName, array $relation)
+    {
+        $localKey   = $relation['localKey'];
+        $foreignKey = $relation['foreignKey'];
+
+        $ids = array_unique(array_column($rows, $localKey));
+
+        if (empty($ids)) {
+            return $rows;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+        $sql = "SELECT *
+            FROM {$relation['table']}
+            WHERE {$foreignKey} IN ($placeholders)";
+
+        $records = $this->db->select($sql, $ids);
+
+        $map = [];
+
+        foreach ($records as $record) {
+            $map[$record[$foreignKey]] = $record;
+        }
+
+        foreach ($rows as &$row) {
+            $row[$relationName] = $map[$row[$localKey]] ?? null;
+        }
+
+        return $rows;
+    }
+
+    private function loadRelations(array $rows)
+    {
+        if (empty($rows) || empty($this->relations)) {
+            return $rows;
+        }
+
+        foreach ($this->relations as $relationName) {
+
+            if (!method_exists($this, $relationName)) {
+                throw new Exception("Relationship '{$relationName}' not found.");
+            }
+
+            $relation = $this->{$relationName}();
+
+            switch ($relation['type']) {
+
+                case 'belongsTo':
+                    $rows = $this->loadBelongsTo($rows, $relationName, $relation);
+                    break;
+
+                case 'hasMany':
+                    $rows = $this->loadHasMany($rows, $relationName, $relation);
+                    break;
+
+                case 'hasOne':
+                    $rows = $this->loadHasOne($rows, $relationName, $relation);
+                    break;
+
+                default:
+                    throw new Exception("Unsupported relationship type: {$relation['type']}");
+            }
+        }
+
+        return $rows;
+    }
+
+
+
     // =========================
     // SELECT
     // =========================
     public function select($columns = "*")
     {
+        if (is_array($columns)) {
+            $columns = implode(", ", $columns);
+        }
+
         $this->select = $columns;
+
         return $this;
     }
 
 
     public function count()
     {
-        $sql = "SELECT COUNT(*) as total FROM {$this->table}";
+        $sql = "SELECT COUNT(*) AS total FROM {$this->table}";
 
-        if ($this->where) {
-            $sql .= " WHERE " . implode(" AND ", $this->where);
+        $conditions = [];
+
+        if (!empty($this->where)) {
+            $conditions[] = implode(" AND ", $this->where);
         }
 
-        $result = $this->db->select($sql, $this->types, $this->params);
-
-        if (!$result) {
-            $this->reset();
-            return 0;
+        if (!empty($this->orWhere)) {
+            $conditions[] = "(" . implode(" OR ", $this->orWhere) . ")";
         }
 
-        $row = $result->fetch_assoc();
+        if (!empty($this->rawWhere)) {
+            $conditions[] = implode(" AND ", $this->rawWhere);
+        }
+
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(" AND ", $conditions);
+        }
+
+        $row = $this->db->selectOne($sql, $this->params);
 
         $this->reset();
 
-        return (int)$row['total'];
+        return $row ? (int)$row['total'] : 0;
     }
 
     // =========================
@@ -65,21 +240,34 @@ class ORM
     // =========================
     public function where($column, $operator, $value)
     {
+        $operator = $this->allowedOperator($operator);
+
         $this->where[] = "$column $operator ?";
         $this->bind($value);
+
         return $this;
     }
+
 
     public function orWhere($column, $operator, $value)
     {
+        $operator = $this->allowedOperator($operator);
+
         $this->orWhere[] = "$column $operator ?";
         $this->bind($value);
+
         return $this;
     }
 
-    public function whereRaw($condition)
+
+    public function whereRaw($condition, array $bindings = [])
     {
         $this->rawWhere[] = $condition;
+
+        foreach ($bindings as $binding) {
+            $this->bind($binding);
+        }
+
         return $this;
     }
 
@@ -94,7 +282,24 @@ class ORM
 
     public function join($table, $condition, $type = "INNER")
     {
+        $allowed = [
+            "INNER",
+            "LEFT",
+            "RIGHT",
+            "FULL",
+            "LEFT OUTER",
+            "RIGHT OUTER"
+
+        ];
+
+        $type = strtoupper($type);
+
+        if (!in_array($type, $allowed)) {
+            throw new Exception("Invalid join type");
+        }
+
         $this->joins[] = "$type JOIN $table ON $condition";
+
         return $this;
     }
 
@@ -109,40 +314,53 @@ class ORM
     // =========================
     public function orderBy($column, $dir = "ASC")
     {
+        $dir = strtoupper($dir);
+
+        if (!in_array($dir, ["ASC", "DESC"])) {
+            throw new Exception("Invalid order direction");
+        }
+
         $this->order = " ORDER BY $column $dir";
+
         return $this;
     }
+
 
     public function groupBy($column)
     {
         $this->group = " GROUP BY $column";
+
         return $this;
     }
 
     // =========================
     // LIMIT / OFFSET
     // =========================
-    public function limit($limit)
+    public function limit(int $limit)
     {
-        $this->limit = " LIMIT $limit";
+        $this->limit = " LIMIT {$limit}";
         return $this;
     }
 
-    public function offset($offset)
+    public function offset(int $offset)
     {
-        $this->offset = " OFFSET $offset";
+        $this->offset = " OFFSET {$offset}";
         return $this;
     }
 
     // =========================
     // RELATIONSHIP (BASIC)
     // =========================
-    public function with($relation)
+    public function with($relations)
     {
-        $this->relations[] = $relation;
+        if (is_string($relations)) {
+            $relations = [$relations];
+        }
+
+        $this->relations = array_merge($this->relations, $relations);
+
         return $this;
     }
-
     // =========================
     // BUILD SQL
     // =========================
@@ -150,37 +368,41 @@ class ORM
     {
         $sql = "SELECT {$this->select} FROM {$this->table}";
 
-        if ($this->joins) {
+        if (!empty($this->joins)) {
             $sql .= " " . implode(" ", $this->joins);
         }
 
-        if ($this->where || $this->orWhere) {
-            $conditions = [];
+        $conditions = [];
 
-            if ($this->where) {
-                $conditions[] = implode(" AND ", $this->where);
-            }
+        if (!empty($this->where)) {
+            $conditions[] = implode(" AND ", $this->where);
+        }
 
-            if ($this->orWhere) {
-                $conditions[] = "(" . implode(" OR ", $this->orWhere) . ")";
-            }
+        if (!empty($this->orWhere)) {
+            $conditions[] = "(" . implode(" OR ", $this->orWhere) . ")";
+        }
 
+        if (!empty($this->rawWhere)) {
+            $conditions[] = implode(" AND ", $this->rawWhere);
+        }
+
+        if (!empty($conditions)) {
             $sql .= " WHERE " . implode(" AND ", $conditions);
         }
 
-        if ($this->group) {
+        if (!empty($this->group)) {
             $sql .= $this->group;
         }
 
-        if ($this->order) {
+        if (!empty($this->order)) {
             $sql .= $this->order;
         }
 
-        if ($this->limit) {
+        if (!empty($this->limit)) {
             $sql .= $this->limit;
         }
 
-        if ($this->offset) {
+        if (!empty($this->offset)) {
             $sql .= $this->offset;
         }
 
@@ -194,29 +416,41 @@ class ORM
     {
         $sql = $this->buildSQL();
 
-        $result = $this->db->select($sql, $this->types, $this->params);
+        $rows = $this->db->select($sql, $this->params);
 
-        if (!$result) {
-            $this->reset();
-            return [];
+        if (!empty($rows) && !empty($this->relations)) {
+            $rows = $this->loadRelations($rows);
         }
-
-        $rows = $result->fetch_all(MYSQLI_ASSOC);
 
         $this->reset();
 
-        return $rows;
+        return $rows ?: [];
+    }
+
+    public function hasOne($relatedTable, $foreignKey, $localKey = "id")
+    {
+        return [
+            'type' => 'hasOne',
+            'table' => $relatedTable,
+            'foreignKey' => $foreignKey,
+            'localKey' => $localKey
+        ];
     }
 
     // =========================
     // FIRST
     // =========================
+    // public function first()
+    // {
+    //     $data = $this->limit(1)->get();
+
+    //     return !empty($data) ? $data[0] : null;
+    // }
     public function first()
     {
-        $data = $this->limit(1)->get();
-
-        return !empty($data) ? $data[0] : null;
+        return $this->limit(1)->get()[0] ?? null;
     }
+
     // =========================
     // increment
     // =========================
@@ -224,16 +458,15 @@ class ORM
     {
         $sql = "UPDATE {$this->table} SET {$column} = {$column} + ?";
 
-        if ($this->where) {
+        if (!empty($this->where)) {
             $sql .= " WHERE " . implode(" AND ", $this->where);
         }
 
         $params = array_merge([$amount], $this->params);
-        $types = $this->type($amount) . $this->types;
 
         $this->reset();
 
-        return $this->db->update($sql, $types, $params);
+        return $this->db->update($sql, $params);
     }
 
     // =========================
@@ -256,74 +489,58 @@ class ORM
 
     public function find($id)
     {
-        $sql = "SELECT {$this->select} 
-            FROM {$this->table} 
-            WHERE {$this->primaryKey} = ? 
+        $sql = "SELECT {$this->select}
+            FROM {$this->table}
+            WHERE {$this->primaryKey} = ?
             LIMIT 1";
 
-        $result = $this->db->select($sql, "i", [$id]);
-
-        if (!$result) {
-            $this->reset();
-            return null;
-        }
-
-        $row = $result->fetch_assoc();
+        $row = $this->db->selectOne($sql, [$id]);
 
         $this->reset();
 
         return $row ?: null;
     }
 
+
+
     // =========================
     // INSERT
     // =========================
-    public function insert($data)
+    public function insert(array $data)
     {
         $fields = array_keys($data);
-        $placeholders = implode(",", array_fill(0, count($fields), "?"));
+        $placeholders = implode(", ", array_fill(0, count($fields), "?"));
 
-        $sql = "INSERT INTO {$this->table} (" . implode(",", $fields) . ")
-                VALUES ($placeholders)";
+        $sql = "INSERT INTO {$this->table} (" . implode(", ", $fields) . ")
+            VALUES ({$placeholders})";
 
-        $types = "";
-        $values = [];
-
-        foreach ($data as $v) {
-            $values[] = $v;
-            $types .= $this->type($v);
-        }
-
-        return $this->db->insert($sql, $types, $values);
+        return $this->db->insert($sql, array_values($data));
     }
 
     // =========================
     // UPDATE
     // =========================
-    public function update($data)
+    public function update(array $data)
     {
         $set = [];
         $params = [];
-        $types = "";
 
-        foreach ($data as $k => $v) {
-            $set[] = "$k = ?";
-            $params[] = $v;
-            $types .= $this->type($v);
+        foreach ($data as $column => $value) {
+            $set[] = "{$column} = ?";
+            $params[] = $value;
         }
 
-        $sql = "UPDATE {$this->table} SET " . implode(",", $set);
+        $sql = "UPDATE {$this->table} SET " . implode(", ", $set);
 
-        if ($this->where) {
+        if (!empty($this->where)) {
             $sql .= " WHERE " . implode(" AND ", $this->where);
         }
 
         $params = array_merge($params, $this->params);
-        $types .= $this->types;
 
         $this->reset();
 
-        return $this->db->update($sql, $types, $params);
+        return $this->db->update($sql, $params);
     }
 
     // =========================
@@ -333,31 +550,31 @@ class ORM
     {
         $sql = "DELETE FROM {$this->table}";
 
-        if ($this->where) {
+        if (!empty($this->where)) {
             $sql .= " WHERE " . implode(" AND ", $this->where);
         }
 
-        $types = $this->types;
         $params = $this->params;
 
         $this->reset();
 
-        return $this->db->delete($sql, $types, $params);
+        return $this->db->delete($sql, $params);
     }
 
     // =========================
     // SEARCH
     // =========================
-    public function search($value, $columns)
+    public function search($value, array $columns)
     {
         $group = [];
 
-        foreach ($columns as $col) {
-            $group[] = "$col LIKE ?";
-            $this->bind("%$value%");
+        foreach ($columns as $column) {
+            $group[] = "{$column} ILIKE ?";
+            $this->bind("%{$value}%");
         }
 
         $this->where[] = "(" . implode(" OR ", $group) . ")";
+
         return $this;
     }
 
@@ -367,14 +584,6 @@ class ORM
     private function bind($value)
     {
         $this->params[] = $value;
-        $this->types .= $this->type($value);
-    }
-
-    private function type($val)
-    {
-        if (is_int($val)) return "i";
-        if (is_float($val)) return "d";
-        return "s";
     }
 
     // =========================
@@ -383,6 +592,32 @@ class ORM
     public function toSql()
     {
         return $this->buildSQL();
+    }
+
+    // ========================
+    // Relationship definitions (belongsTo(), hasMany(), hasOne())
+    // ========================
+    // A model class that declares relationships
+    // Eager loading via with()
+
+    public function belongsTo($relatedTable, $foreignKey, $ownerKey = "id")
+    {
+        return [
+            'type' => 'belongsTo',
+            'table' => $relatedTable,
+            'foreignKey' => $foreignKey,
+            'ownerKey' => $ownerKey
+        ];
+    }
+
+    public function hasMany($relatedTable, $foreignKey, $localKey = "id")
+    {
+        return [
+            'type' => 'hasMany',
+            'table' => $relatedTable,
+            'foreignKey' => $foreignKey,
+            'localKey' => $localKey
+        ];
     }
 
     // =========================
@@ -394,8 +629,8 @@ class ORM
         $this->joins = [];
         $this->where = [];
         $this->orWhere = [];
+        $this->rawWhere = [];
         $this->params = [];
-        $this->types = "";
         $this->order = "";
         $this->group = "";
         $this->limit = "";
