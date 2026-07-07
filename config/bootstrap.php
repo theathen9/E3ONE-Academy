@@ -1,7 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
 // ./config/bootstrap.php
 date_default_timezone_set('Asia/Phnom_Penh');
 
