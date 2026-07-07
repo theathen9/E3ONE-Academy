@@ -1,8 +1,5 @@
 <?php
 // ./config/db.php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 // Database credentials (replace with your actual values)
 // $servername = "localhost";   // Hosting mySQL
 // $username   = "root";        // Your DB username
