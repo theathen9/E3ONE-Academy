@@ -1,8 +1,0 @@
-require_once __DIR__ . '/../auth/auth.php';
-
-$userId = checkAuth();
-authorizeRole([1]); // only admin
-
-echo "User ID: " . $_SESSION['user_id'];
-echo "Reference ID: " . $_SESSION['reference_id'];
-echo "Type: " . $_SESSION['reference_type'];
