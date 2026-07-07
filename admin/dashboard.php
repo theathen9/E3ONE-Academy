@@ -1,12 +1,6 @@
-    <?php
-    // echo "<pre>";
-    // print_r($_SESSION);
-    // print_r($_COOKIE);
-    // exit;
-    //./admin/institute/employees.php
-
-    include_once __DIR__ . '/../config/bootstrap.php';
-    date_default_timezone_set('Asia/Phnom_Penh');
+<?php
+include_once __DIR__ . '/../config/bootstrap.php';
+date_default_timezone_set('Asia/Phnom_Penh');
 
     include_once __DIR__ . '/../data/dataSchema.php';
     // require_once __DIR__ . '/../auth/auth.php';
