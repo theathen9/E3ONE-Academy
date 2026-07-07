@@ -3,40 +3,29 @@ require_once '../config/db.php';
 
 $token = $_GET['token'] ?? '';
 
-// PDO SELECT
-$stmt = $conn->prepare("
-    SELECT user_id, reset_expiry 
-    FROM tblUsers 
-    WHERE reset_token = ?
-");
+$stmt = $conn->prepare("SELECT user_id, reset_expiry FROM tblUsers WHERE reset_token = ?");
+$stmt->bind_param("s", $token);
+$stmt->execute();
 
-$stmt->execute([$token]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
 
-// check token validity
 if (!$user || strtotime($user['reset_expiry']) < time()) {
     die("Invalid or expired token!");
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     $password = $_POST['password'];
-    $confirm  = $_POST['confirm'];
+    $confirm = $_POST['confirm'];
 
     if ($password !== $confirm) {
         echo "Passwords do not match!";
     } else {
-
         $hashed = password_hash($password, PASSWORD_BCRYPT);
 
-        // PDO UPDATE
-        $update = $conn->prepare("
-            UPDATE tblUsers 
-            SET password = ?, reset_token = NULL, reset_expiry = NULL 
-            WHERE user_id = ?
-        ");
-
-        $update->execute([$hashed, $user['user_id']]);
+        $update = $conn->prepare("UPDATE tblUsers SET password = ?, reset_token = NULL, reset_expiry = NULL WHERE user_id = ?");
+        $update->bind_param("si", $hashed, $user['user_id']);
+        $update->execute();
 
         echo "Password updated successfully! <a href='signin.php'>Login</a>";
     }

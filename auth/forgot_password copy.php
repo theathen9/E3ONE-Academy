@@ -2,33 +2,26 @@
 require_once '../config/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     $email = $_POST['email'];
 
-    // PDO SELECT
     $stmt = $conn->prepare("SELECT user_id FROM tblUsers WHERE email = ?");
-    $stmt->execute([$email]);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
 
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
 
     if ($user) {
-
         $token = bin2hex(random_bytes(32));
         $expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
 
-        // PDO UPDATE
-        $update = $conn->prepare("
-            UPDATE tblUsers 
-            SET reset_token = ?, reset_expiry = ? 
-            WHERE user_id = ?
-        ");
-
-        $update->execute([$token, $expiry, $user['user_id']]);
+        $update = $conn->prepare("UPDATE tblUsers SET reset_token = ?, reset_expiry = ? WHERE user_id = ?");
+        $update->bind_param("ssi", $token, $expiry, $user['user_id']);
+        $update->execute();
 
         $resetLink = "http://localhost/system-management/auth/reset_password.php?token=$token";
 
         echo "Password reset link: <a href='$resetLink'>$resetLink</a>";
-
     } else {
         echo "Email not found!";
     }

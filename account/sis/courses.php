@@ -21,11 +21,11 @@ if (!$userId) {
     header("Location: ../auth/signin.php");
     exit;
 }
-authorizeRole('admin');
+authorizeRole('accountant');
 
-$routeAdmin[0]["active"] = false;
-$routeAdmin[2]["active"] = true;
-$routeAdmin[2]['submenu'][1]['active'] = true;
+$routeAccount[0]["active"] = false;
+$routeAccount[2]["active"] = true;
+$routeAccount[2]['submenu'][1]['active'] = true;
 
 
 $limit = 18;
@@ -222,7 +222,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="container-fluid p-0 overflow-x-hidden">
     <div class="row g-3">
 
-        <?php Navbar($infoSchemaData, $routeAdmin); ?>
+        <?php Navbar($infoSchemaData, $routeAccount); ?>
 
 
         <!-- Main area -->

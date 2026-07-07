@@ -21,15 +21,21 @@ CREATE TABLE tblRooms (
     -- FOREIGN KEY (branch_id) REFERENCES tblBranches(branch_id)
 );
 
+CREATE TABLE tblBranches (
+    branch_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    status BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE tblDepartments (
-    department_id INT AUTO_INCREMENT PRIMARY KEY,
+    department_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     -- branch_id INT NOT NULL,
     department_code VARCHAR(20) UNIQUE NOT NULL,
     department_name VARCHAR(100) NOT NULL,
     description TEXT,
     status TINYINT(1) DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP 
     
     -- FOREIGN KEY (branch_id) REFERENCES tblBranches(branch_id)
 );

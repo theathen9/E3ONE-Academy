@@ -27,8 +27,7 @@ if ($user && isset($_SESSION['loggedin'])) {
 $success = "";
 $error = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-    verifyCSRF();
+    verifyCSRF(); // 🔥 ADD THIS
 
     $user = trim($_POST["username"]);
     $pass = trim($_POST["password"]);
@@ -39,118 +38,85 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         $id = intval($user);
 
-        $stmt = $conn->prepare("
-            SELECT 
-                u.user_id,
-                u.username,
-                u.password,
-                u.role_id,
-                r.role_name,
-                u.email,
-                u.reference_id,
-                u.reference_type,
-                u.user_agent,
-                u.ip_address
-            FROM tblUsers u
-            LEFT JOIN tblRoles r ON u.role_id = r.role_id
-            WHERE u.username = :user 
-               OR u.user_id = :id 
-               OR u.email = :user
-            LIMIT 1
-        ");
+        $stmt = $conn->prepare(
+            "SELECT  u.user_id,  u.username,  u.password,  u.role_id,  r.role_name,  u.email,
+        u.reference_id, u.reference_type, u.user_agent, u.ip_address
+     FROM tblUsers u
+     LEFT JOIN tblRoles r ON u.role_id = r.role_id
+     WHERE u.username = ? OR u.user_id = ? OR u.email = ?
+     LIMIT 1"
+        );
+        $stmt->bind_param("sis", $user, $id, $user);
+        $stmt->execute();
 
-        $stmt->execute([
-            ":user" => $user,
-            ":id"   => $id
-        ]);
+        $result = $stmt->get_result();
 
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result && $row = $result->fetch_assoc()) {
+            if (password_verify($pass, $row["password"])) {
+                session_regenerate_id(true);
+                $accessToken  = bin2hex(random_bytes(32));
+                $refreshToken = bin2hex(random_bytes(64));
+                $hashedRefresh = hash('sha256', $refreshToken);
+                $hashedToken = hash('sha256', $accessToken);
 
-        
+                $accessExpiry  = date('Y-m-d H:i:s', strtotime('+5 minutes'));
+                $refreshExpiry = date('Y-m-d H:i:s', strtotime('+1 days'));
+                // $refreshExpiry = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+                $update = $conn->prepare("UPDATE tblUsers SET last_login = NOW(), access_token=?, refresh_token=?, 
+                access_expiry=?, refresh_expiry=? WHERE user_id=?");
+                $update->bind_param("ssssi", $hashedToken, $hashedRefresh, $accessExpiry, $refreshExpiry, $row['user_id']);
+                $update->execute();
 
-        if ($row && password_verify($pass, $row["password"])) {
+                $_SESSION['loggedin'] = true;
+                $_SESSION["user_id"] = $row["user_id"];
+                // $_SESSION["role_id"] = $row["role_id"];
+                $_SESSION["role"] = strtolower($row["role_name"]);
+                $_SESSION["reference_id"] = $row["reference_id"];
+                $_SESSION["reference_type"] = $row["reference_type"];
+                // $_SESSION['last_auth_check'] = time();
+                $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
 
-            session_regenerate_id(true);
-
-            $accessToken  = bin2hex(random_bytes(32));
-            $refreshToken = bin2hex(random_bytes(64));
-
-            $hashedToken   = hash('sha256', $accessToken);
-            $hashedRefresh = hash('sha256', $refreshToken);
-
-            $accessExpiry  = date('Y-m-d H:i:s', strtotime('+5 minutes'));
-            $refreshExpiry = date('Y-m-d H:i:s', strtotime('+1 days'));
-
-            $update = $conn->prepare("
-                UPDATE tblUsers 
-                SET last_login = NOW(),
-                    access_token = :access_token,
-                    refresh_token = :refresh_token,
-                    access_expiry = :access_expiry,
-                    refresh_expiry = :refresh_expiry
-                WHERE user_id = :user_id
-            ");
-
-            $update->execute([
-                ":access_token"  => $hashedToken,
-                ":refresh_token" => $hashedRefresh,
-                ":access_expiry" => $accessExpiry,
-                ":refresh_expiry"=> $refreshExpiry,
-                ":user_id"       => $row['user_id']
-            ]);
-
-            $_SESSION['loggedin'] = true;
-            $_SESSION["user_id"] = $row["user_id"];
-            $_SESSION["role"] = strtolower($row["role_name"]);
-            $_SESSION["reference_id"] = $row["reference_id"];
-            $_SESSION["reference_type"] = $row["reference_type"];
-
-            $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
-
-            $userId = $_SESSION["user_id"];
-            $signature = hash_hmac('sha256', $userId, APP_SECRET);
-            $value = $userId . "." . $signature;
-
-            setcookie("c_user", $value, [
-                'expires' => strtotime($refreshExpiry),
-                'path' => '/',
-                'secure' => $secure,
-                'httponly' => true,
-                'samesite' => 'Lax'
-            ]);
-
-            setcookie("access_token", $accessToken, [
-                'expires' => strtotime($accessExpiry),
-                'path' => '/',
-                'secure' => $secure,
-                'httponly' => true,
-                'samesite' => 'Lax'
-            ]);
-
-            setcookie("refresh_token", $refreshToken, [
-                'expires' => strtotime($refreshExpiry),
-                'path' => '/',
-                'secure' => $secure,
-                'httponly' => true,
-                'samesite' => 'Lax'
-            ]);
-
-            switch (strtolower($row["role_name"])) {
-                case "admin":
-                    header("Location: ../admin/dashboard.php");
-                    break;
-                case "accountant":
-                    header("Location: ../account/dashboard.php");
-                    break;
-                case "teacher":
-                    header("Location: ../teacher/dashboard.php");
-                    break;
-                default:
-                    header("Location: ../student/dashboard.php");
+             
+                $userId = $_SESSION["user_id"];
+                $signature = hash_hmac('sha256', $userId, APP_SECRET);
+                $value = $userId . "." . $signature;
+                setcookie("c_user", $value, [
+                    'expires' => strtotime($refreshExpiry),
+                    'path' => '/',
+                    'secure' => $secure, // ✅ FIX
+                    'httponly' => true,
+                    'samesite' => 'Lax'
+                ]);
+                   setcookie("access_token", $accessToken, [
+                    'expires' => strtotime($accessExpiry),
+                    'path' => '/',
+                    'secure' => $secure,
+                    'httponly' => true,
+                    'samesite' => 'Lax'
+                ]);
+                setcookie("refresh_token", $refreshToken, [
+                    'expires' => strtotime($refreshExpiry),
+                    'path' => '/',
+                    'secure' => $secure,
+                    'httponly' => true,
+                    'samesite' => 'Lax'
+                ]);
+                switch (strtolower($row["role_name"])) {
+                    case "admin":
+                        header("Location: ../admin/dashboard.php");
+                        break;
+                    case "accountant":
+                        header("Location: ../account/dashboard.php");
+                        break;
+                    case "teacher":
+                        header("Location: ../teacher/dashboard.php");
+                        break;
+                    default:
+                        header("Location: ../student/dashboard.php");
+                }
+                exit;
             }
-            exit;
         }
-
         $error = "Invalid username or password!";
     }
 }

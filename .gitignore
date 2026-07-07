@@ -1,15 +1,16 @@
 # ======================
 # Dependencies
 # ======================
-node_modules/
+/vendor/
 vendor/
+node_modules/
 
 # ======================
-# Environment files
+# Environment
 # ======================
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
 
 # ======================
 # Logs
@@ -18,74 +19,57 @@ vendor/
 logs/
 
 # ======================
-# Cache / Temp
+# Cache / Sessions
 # ======================
 cache/
 tmp/
 temp/
+sessions/
 
 # ======================
-# Uploaded files
+# Uploads
 # ======================
 uploads/
 storage/
 
 # ======================
-# IDE / Editor
+# IDE
 # ======================
 .vscode/
 .idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
 
 # ======================
-# OS Files
+# OS
 # ======================
 .DS_Store
 Thumbs.db
 
 # ======================
-# Laragon / Local config
-# ======================
-laragon.ini
-
-# ======================
-# Build output
+# Build
 # ======================
 dist/
 build/
 
 # ======================
-# Database dumps
+# Database
 # ======================
 *.sql
 *.sqlite
 
 # ======================
-# PHPUnit
+# Composer
 # ======================
-.phpunit.result.cache
-
-# ======================
-# Composer lock (optional)
-# ======================
+# Keep composer.lock committed
 # composer.lock
 
 # ======================
-# Session files
-# ======================
-sessions/
-
-# ======================
-# API secrets / config
+# Secrets
 # ======================
 config/secrets.php
 config/private/
 
 # ======================
-# Generated files
+# Archives
 # ======================
 *.zip
 *.tar

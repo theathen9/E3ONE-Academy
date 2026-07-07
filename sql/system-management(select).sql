@@ -550,7 +550,8 @@ ORDER BY
 
 
 
-
+ALTER TABLE tblDepartments
+ALTER COLUMN status SET DEFAULT 1;
 
 
 
