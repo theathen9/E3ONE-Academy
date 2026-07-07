@@ -15,6 +15,8 @@ if (file_exists($envPath . '/.env')) {
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/app.php';
+
 
 require_once __DIR__ . '/../helpers/request.php';
 require_once __DIR__ . '/../helpers/response.php';
