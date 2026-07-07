@@ -43,17 +43,18 @@
     $db = new DB($conn);
     $teacherCRUD = new ORM($db, 'tblEmployees', 'employee_id');
 
-    // Fetch DISTINCT years (clean)
-    $yearResult = $conn->query("
-        SELECT DISTINCT SUBSTRING_INDEX(academic_year, '-', 1) AS year
-        FROM tblClasses
-        ORDER BY year ASC
-    ");
+   // Fetch DISTINCT years (clean)
+$stmt = $conn->query("
+    SELECT DISTINCT SPLIT_PART(academic_year, '-', 1) AS year
+    FROM tblClasses
+    ORDER BY year ASC
+");
 
-    $years = [];
-    while ($row = $yearResult->fetch_assoc()) {
-        $years[] = $row['year'];
-    }
+$years = [];
+
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $years[] = $row['year'];
+}
 
     // Get filters
     $selectTeacher = isset($_GET['teacher']) && $_GET['teacher'] !== ''
