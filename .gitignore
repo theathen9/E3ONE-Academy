@@ -3,7 +3,14 @@
 # ======================
 /vendor/
 vendor/
+vendor/dompdf/dompdf/
 node_modules/
+
+
+# ======================
+# GitHub Actions
+# ======================
+
 
 # ======================
 # Environment
