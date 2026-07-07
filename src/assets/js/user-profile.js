@@ -1,5 +1,5 @@
 // ./src/assets/js/user-profile.js
-const BASE_URL = "/system-management";
+const BASE_URL = "https://e3oneacademy.vercel.app";
 
 function updateUserUI(user) {
     const username = document.querySelector("#username");
