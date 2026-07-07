@@ -1,8 +1,10 @@
 <?php
 // ./auth/signin.php (from Page)
 date_default_timezone_set('Asia/Phnom_Penh');
-include_once __DIR__ . '/config/bootstrap.php';
-include_once __DIR__ . '/app/api/v1/auth.php';
+
+require_once __DIR__ . '/../config/bootstrap.php';
+require_once __DIR__ . '/../app/api/v1/auth.php';
+
 $user = checkAuth();
 if ($user && isset($_SESSION['loggedin'])) {
     switch (strtolower($_SESSION['role'])) {
