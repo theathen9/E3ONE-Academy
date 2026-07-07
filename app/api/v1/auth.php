@@ -2,9 +2,6 @@
 // ./app/api/v1/auth.php
 // header('Content-Type: application/json');
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 include_once __DIR__ . '/../../../config/app.php';
 include_once __DIR__ . '/../../../config/db.php';
 
