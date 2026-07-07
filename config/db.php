@@ -18,19 +18,17 @@
 
 
 // ./config/db.php
-
-$host = $_ENV['DB_POSTGRESQL_HOST_KEY'];
-$port = $_ENV['DB_POSTGRESQL_PORT_KEY'];
+$dns = $_ENV['DB_POSTGRESQL_DNS_KEY'];
+// $port = $_ENV['DB_POSTGRESQL_PORT_KEY'];
 $username = $_ENV['DB_POSTGRESQL_USERNAME_KEY'];
 $password = $_ENV['DB_POSTGRESQL_PASSWORD_KEY'];
-$dbname = $_ENV['DB_POSTGRESQL_DATABASE_KEY'];
 
 $postgresqlUrl = $_ENV['POSTGRES_URL_KEY'] ?? null;
 
 
 try {
     $conn = new PDO(
-        $postgresqlUrl ?: "pgsql:host=$host;port=$port;dbname=$dbname",
+        $postgresqlUrl ?: $dns,
         $username,
         $password
     );
