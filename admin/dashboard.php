@@ -5,7 +5,7 @@
     // exit;
     //./admin/institute/employees.php
     // require_once( __DIR__ . "/../../config/db.php");
-    session_start();
+
     date_default_timezone_set('Asia/Phnom_Penh');
     // include_once __DIR__ . '/../config/db.php';
     // include_once __DIR__ . '/../config/app.php';
