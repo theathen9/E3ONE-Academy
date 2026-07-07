@@ -1,9 +1,10 @@
 <?php
-// ./config/bootstrap.php
-date_default_timezone_set('Asia/Phnom_Penh');
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+// ./config/bootstrap.php
+date_default_timezone_set('Asia/Phnom_Penh');
+
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/db.php';
 
