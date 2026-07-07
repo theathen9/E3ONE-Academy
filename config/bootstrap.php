@@ -4,6 +4,11 @@ session_start();
 date_default_timezone_set('Asia/Phnom_Penh');
 
 require_once __DIR__ . '/../vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->load();
+
+require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/db.php';
 
 require_once __DIR__ . '/../helpers/request.php';
