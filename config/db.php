@@ -25,10 +25,12 @@ $username = $_ENV['DB_POSTGRESQL_USERNAME_KEY'];
 $password = $_ENV['DB_POSTGRESQL_PASSWORD_KEY'];
 $dbname = $_ENV['DB_POSTGRESQL_DATABASE_KEY'];
 
+$postgresqlUrl = $_ENV['POSTGRES_URL_KEY'] ?? null;
+
 
 try {
     $conn = new PDO(
-        "pgsql:host=$host;port=$port;dbname=$dbname",
+        $postgresqlUrl ?: "pgsql:host=$host;port=$port;dbname=$dbname",
         $username,
         $password
     );
