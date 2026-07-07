@@ -15,15 +15,16 @@ if (session_status() === PHP_SESSION_NONE) {
 // include_once __DIR__ . '/../../core/CRUD.php';
 // include_once __DIR__ . '/../core/ORM.php';
 
-include_once __DIR__ . '/../data/dbSchemaData.php';
-include_once __DIR__ . '/../data/functionData.php';
 include_once __DIR__ . '/../config/bootstrap.php';
+include_once __DIR__ . '/../app/api/v1/auth.php';
+
+// include_once __DIR__ . '/../data/dbSchemaData.php';
+include_once __DIR__ . '/../data/functionData.php';
 include_once __DIR__ . '/../components/Navbar.php';
 include_once __DIR__ . '/../components/Avatar.php';
 include_once __DIR__ . '/../components/RegisterStaff.php';
 include_once __DIR__ . '/../components/RegisterStudent.php';
-// include_once __DIR__ . '/../data/register_student.php';
-// include_once __DIR__ . '/../data/register_staff.php';
+
 
 
 // include_once __DIR__ . '/api/dashboard.php';
