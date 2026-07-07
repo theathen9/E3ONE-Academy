@@ -78,3 +78,8 @@ echo json_encode([
             : $user['username'])
     ]
 ]);
+
+echo json_encode([
+    "cookie" => $_COOKIE,
+    "session" => $_SESSION,
+]);
