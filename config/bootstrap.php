@@ -5,8 +5,13 @@ date_default_timezone_set('Asia/Phnom_Penh');
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
-$dotenv->load();
+use Dotenv\Dotenv;
+
+$envPath = dirname(__DIR__);
+
+if (file_exists($envPath . '/.env')) {
+    Dotenv::createImmutable($envPath)->load();
+}
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/db.php';
