@@ -5,6 +5,7 @@
     // exit;
     //./admin/institute/employees.php
     // require_once( __DIR__ . "/../../config/db.php");
+    session_start();
     date_default_timezone_set('Asia/Phnom_Penh');
     // include_once __DIR__ . '/../config/db.php';
     // include_once __DIR__ . '/../config/app.php';
@@ -43,18 +44,16 @@
     $teacherCRUD = new ORM($db, 'tblEmployees', 'employee_id');
 
     // Fetch DISTINCT years (clean)
-  // Fetch DISTINCT years (clean)
-$stmt = $conn->query("
-    SELECT DISTINCT SPLIT_PART(academic_year, '-', 1) AS year
-    FROM tblClasses
-    ORDER BY year ASC
-");
+    $yearResult = $conn->query("
+        SELECT DISTINCT SUBSTRING_INDEX(academic_year, '-', 1) AS year
+        FROM tblClasses
+        ORDER BY year ASC
+    ");
 
-$years = [];
-
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $years[] = $row['year'];
-}
+    $years = [];
+    while ($row = $yearResult->fetch_assoc()) {
+        $years[] = $row['year'];
+    }
 
     // Get filters
     $selectTeacher = isset($_GET['teacher']) && $_GET['teacher'] !== ''

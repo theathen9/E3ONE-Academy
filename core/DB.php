@@ -3,101 +3,86 @@
 
 class DB
 {
-    private PDO $conn;
+    private $conn;
 
-    public function __construct(PDO $conn)
+    public function __construct($conn)
     {
         $this->conn = $conn;
     }
 
-
-    // 🔥 CORE QUERY EXECUTOR (INSERT/UPDATE/DELETE)
-    public function execute($sql, $params = [])
+    // 🔥 CORE QUERY EXECUTOR (for INSERT/UPDATE/DELETE)
+    public function execute($sql, $types = "", $params = [])
     {
         $stmt = $this->conn->prepare($sql);
 
         if (!$stmt) {
-            throw new Exception("Prepare failed");
+            throw new Exception("Prepare failed: " . $this->conn->error);
         }
 
-        if (!$stmt->execute($params)) {
-            throw new Exception(
-                "Execute failed: " . implode(
-                    ", ",
-                    $stmt->errorInfo()
-                )
-            );
+        // bind params if exists
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+
+        if (!$stmt->execute()) {
+            throw new Exception("Execute failed: " . $stmt->error);
         }
 
         return $stmt;
     }
 
-
     // 🔍 SELECT MULTIPLE ROWS
-    public function select($sql, $params = [])
+    public function select($sql, $types = "", $params = [])
     {
-        $stmt = $this->execute($sql, $params);
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->execute($sql, $types, $params);
+        return $stmt->get_result();
     }
-
 
     // 🔍 SELECT SINGLE ROW
-    public function selectOne($sql, $params = [])
+    public function selectOne($sql, $types = "", $params = [])
     {
-        $stmt = $this->execute($sql, $params);
-
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $this->select($sql, $types, $params);
+        return $result->fetch_assoc();
     }
 
-
-    // ➕ INSERT (returns PostgreSQL ID)
-    public function insert($sql, $params = [])
+    // ➕ INSERT (returns last insert ID)
+    public function insert($sql, $types = "", $params = [])
     {
-        $this->execute($sql, $params);
-
-        return $this->conn->lastInsertId();
+        $stmt = $this->execute($sql, $types, $params);
+        return $this->conn->insert_id;
     }
 
-
-    // ✏️ UPDATE
-    public function update($sql, $params = [])
+    // ✏️ UPDATE (returns affected rows)
+    public function update($sql, $types = "", $params = [])
     {
-        $stmt = $this->execute($sql, $params);
-
-        return $stmt->rowCount();
+        $stmt = $this->execute($sql, $types, $params);
+        return $stmt->affected_rows;
     }
 
-
-    // ❌ DELETE
-    public function delete($sql, $params = [])
+    // ❌ DELETE (returns affected rows)
+    public function delete($sql, $types = "", $params = [])
     {
-        $stmt = $this->execute($sql, params);
-
-        return $stmt->rowCount();
+        $stmt = $this->execute($sql, $types, $params);
+        return $stmt->affected_rows;
     }
 
-
-    // 🔁 TRANSACTION
+    // 🔁 TRANSACTIONS
     public function beginTransaction()
     {
-        $this->conn->beginTransaction();
+        $this->conn->begin_transaction();
     }
-
 
     public function commit()
     {
         $this->conn->commit();
     }
 
-
     public function rollback()
     {
-        $this->conn->rollBack();
+        $this->conn->rollback();
     }
 
-
-    // 🧠 GET RAW CONNECTION
+    // 🧠 GET RAW CONNECTION (optional advanced use)
     public function getConnection()
     {
         return $this->conn;

@@ -1,7 +1,9 @@
 # ======================
 # Dependencies
 # ======================
+/vendor/
 vendor/
+vendor/dompdf/dompdf/
 node_modules/
 
 
