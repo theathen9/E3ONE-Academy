@@ -19,11 +19,11 @@
 
 // ./config/db.php
 
-$host = "dpg-d953l9kvikkc73d87fo0-a.oregon-postgres.render.com";
-$port = 5432;
-$dbname = "systemacademy";
-$username = "systemacademy_user";
-$password = "nvO3JsebMJWRG0U0rJ3MU3oGNsPsy35J";
+$host = $_ENV['DB_POSTGRESQL_HOST_KEY'];
+$port = $_ENV['DB_POSTGRESQL_PORT_KEY'];
+$username = $_ENV['DB_POSTGRESQL_USERNAME_KEY'];
+$password = $_ENV['DB_POSTGRESQL_PASSWORD_KEY'];
+$dbname = $_ENV['DB_POSTGRESQL_DATABASE_KEY'];
 
 
 try {
