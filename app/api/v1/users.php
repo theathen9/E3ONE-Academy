@@ -2,10 +2,11 @@
 
 header('Content-Type: application/json');
 
-require_once __DIR__ . '/../../../config/bootstrap.php';
+include_once __DIR__ . '/../../../config/bootstrap.php';
+// include_once __DIR__ . '/../../../config/bootstrap.php';
+
 
 if (!isset($_COOKIE['refresh_token']) || empty($_COOKIE['refresh_token'])) {
-    // echo json_encode(["error" => "Session expired"]);
     http_response_code(401);
     exit;
 }
@@ -21,74 +22,59 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-$sql = "
-SELECT 
-    u.user_id,
-    u.username,
-    u.email AS login_email,
-    u.reference_type,
-    r.role_name,
 
-    e.employee_id,
-    TRIM(CONCAT(
-    COALESCE(e.first_name_kh, ''),
-    ' ',
-    COALESCE(e.last_name_kh, '')
-)) AS full_name_kh,
+$db = new DB($conn);
+$userORM = new ORM($db, "tblUsers u", "user_id");
 
-TRIM(CONCAT(
-    COALESCE(e.first_name_en, ''),
-    ' ',
-    COALESCE(e.last_name_en, '')
-)) AS full_name_en,
- CASE 
-    WHEN e.first_name_kh IS NOT NULL AND e.first_name_kh != ''
-        THEN TRIM(CONCAT(e.first_name_kh, ' ', e.last_name_kh))
-    WHEN e.first_name_en IS NOT NULL AND e.first_name_en != ''
-        THEN TRIM(CONCAT(e.first_name_en, ' ', e.last_name_en))
-    ELSE u.username
-    END AS display_name,
-    e.gender,
-    e.phone1,
-    e.phone2,
-    e.email AS employee_email,
-    e.profile_image,
-    e.status,
-    e.hired_at
+$user = $userORM
+    ->select([
+        "u.user_id",
+        "u.username",
+        "u.email AS login_email",
+        "u.reference_type",
+        "r.role_name",
+        "e.employee_id",
 
-FROM tblUsers u
+        "TRIM(COALESCE(e.first_name_kh,'') || ' ' || COALESCE(e.last_name_kh,'')) AS full_name_kh",
 
-LEFT JOIN tblEmployees e 
-ON (
-    u.reference_id = e.employee_id
-    AND u.reference_type = 'Employee'
-)
-LEFT JOIN tblRoles r
-ON u.role_id = r.role_id
-WHERE u.user_id = ?
-LIMIT 1
-";
+        "TRIM(COALESCE(e.first_name_en,'') || ' ' || COALESCE(e.last_name_en,'')) AS full_name_en",
 
-$stmt = mysqli_prepare($conn, $sql);
+        "CASE
+            WHEN e.first_name_kh IS NOT NULL AND e.first_name_kh <> ''
+                THEN TRIM(e.first_name_kh || ' ' || COALESCE(e.last_name_kh,''))
+            WHEN e.first_name_en IS NOT NULL AND e.first_name_en <> ''
+                THEN TRIM(e.first_name_en || ' ' || COALESCE(e.last_name_en,''))
+            ELSE u.username
+        END AS display_name",
 
-mysqli_stmt_bind_param($stmt, "i", $user_id);
+        "e.gender",
+        "e.phone1",
+        "e.phone2",
+        "e.email AS employee_email",
+        "e.profile_image",
+        "e.status",
+        "e.hired_at"
+    ])
+    ->join(
+        "tblEmployees e",
+        "u.reference_id = e.employee_id AND u.reference_type = 'Employee'",
+        "LEFT"
+    )
+    ->join(
+        "tblRoles r",
+        "u.role_id = r.role_id",
+        "LEFT"
+    )
+    ->where("u.user_id", "=", $user_id)
+    ->first();
 
-mysqli_stmt_execute($stmt);
-
-$result = mysqli_stmt_get_result($stmt);
-
-$user = mysqli_fetch_assoc($result);
-
-// echo json_encode([
-//     "success" => true,
-//     "data" => $user
-// ]);
 echo json_encode([
     "success" => true,
     "data" => [
         ...$user,
-        "display_name" => $user['full_name_kh']
-            ?? $user['full_name_en']
-            ?? $user['username']
+        "display_name" =>
+            !empty($user['full_name_kh']) ? $user['full_name_kh']
+            : (!empty($user['full_name_en']) ? $user['full_name_en']
+            : $user['username'])
     ]
 ]);
