@@ -1,7 +1,7 @@
 <?php
 // ./app/api/v1/auth.php
 // header('Content-Type: application/json');
-require_once __DIR__ . "/../../config/bootstrap.php";
+// require_once dirname(__DIR__) . '/config/bootstrap.php';
 
 
 
