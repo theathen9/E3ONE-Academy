@@ -1,9 +1,10 @@
 <?php
-include_once __DIR__ . '/../../../data/dataSchema.php';
 include_once __DIR__ . '/../../../config/bootstrap.php';
+include_once __DIR__ . '/../app/api/v1/auth.php';
+include_once __DIR__ . '/../../../data/dataSchema.php';
 include_once __DIR__ . '/../../../components/Navbar.php';
 include_once __DIR__ . '/../../../components/Avatar.php';
-include_once __DIR__ . '/../app/api/v1/auth.php';
+
 // include_once __DIR__ . '/../../../core/Cache.php';
 
 $userId = checkAuth();
