@@ -6,8 +6,6 @@
 include_once __DIR__ . '/../../../config/bootstrap.php';
 header('Content-Type: application/json');
 
-date_default_timezone_set('Asia/Phnom_Penh');
-
 
 /* =========================
    AUTH
