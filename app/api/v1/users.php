@@ -83,3 +83,4 @@ echo json_encode([
     "cookie" => $_COOKIE,
     "session" => $_SESSION,
 ]);
+?>
