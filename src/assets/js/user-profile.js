@@ -61,6 +61,6 @@ async function refreshUser() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    refreshUser();
     loadCachedUser();
+    refreshUser();
 });
