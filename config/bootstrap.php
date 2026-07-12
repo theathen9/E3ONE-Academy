@@ -28,3 +28,4 @@ require_once __DIR__ . '/../helpers/csrf.php';
 require_once __DIR__ . '/../core/DB.php';
 require_once __DIR__ . '/../core/ORM.php';
 require_once __DIR__ . '/../core/Cache.php';
+?>
