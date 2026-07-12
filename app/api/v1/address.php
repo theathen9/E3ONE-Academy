@@ -63,3 +63,4 @@ switch ($type) {
             "error" => "Invalid type"
         ]);
 }
+?>
