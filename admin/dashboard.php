@@ -802,7 +802,7 @@ $revenueCard = $conn->query($getRevenueCard)->fetch(PDO::FETCH_ASSOC)['total'];
             try {
 
                 const response = await fetch(
-                    `/system-management/api/v1/classes_by_teacher.php?teacher_id=${teacherId}`
+                    `<?= BASE_URL ?>/api/v1/classes_by_teacher.php?teacher_id=${teacherId}`
                 );
 
                 const data = await response.json();
