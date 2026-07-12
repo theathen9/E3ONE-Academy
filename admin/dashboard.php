@@ -931,7 +931,7 @@ $revenueCard = $conn->query($getRevenueCard)->fetch(PDO::FETCH_ASSOC)['total'];
 
                 params.set('status', statuses.join(','));
 
-                const url = `/system-management/api/v1/dashboard.php?${params.toString()}`;
+                const url = <?= BASE_URL ?>.`/api/v1/dashboard.php?${params.toString()}`;
                 console.log("Final URL:", url);
 
                 const res = await fetch(url);
