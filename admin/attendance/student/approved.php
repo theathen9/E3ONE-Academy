@@ -1,14 +1,14 @@
 <?php
-date_default_timezone_set('Asia/Phnom_Penh');
 include_once __DIR__ . '/../../../data/dataSchema.php';
 include_once __DIR__ . '/../../../config/bootstrap.php';
 include_once __DIR__ . '/../../../components/Navbar.php';
 include_once __DIR__ . '/../../../components/Avatar.php';
+include_once __DIR__ . '/../../../api/v1/auth.php';
 // include_once __DIR__ . '/../../../core/Cache.php';
 
 $userId = checkAuth();
 if (!$userId) {
-    header("Location: " . BASE_URL . "/auth/signin.php");
+    header("Location: " . BASE_URL . "/auth/signin");
     exit;
 }
 authorizeRole('admin');
