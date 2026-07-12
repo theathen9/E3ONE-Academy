@@ -536,6 +536,7 @@ $revenueCard = $conn->query($getRevenueCard)->fetch(PDO::FETCH_ASSOC)['total'];
         let selectYear = "<?= $selectedYear ?>";
         let selectClass = "<?= $selectedClass ?>";
         let selectTeacher = "<?= $selectTeacher  ?>";
+         const BASE_URL = "<?= BASE_URL ?>";
 
         // ----------------------
         // Flatpickr Setup
@@ -800,9 +801,8 @@ $revenueCard = $conn->query($getRevenueCard)->fetch(PDO::FETCH_ASSOC)['total'];
         async function loadClasses(teacherId = 'allTeachers') {
 
             try {
-
                 const response = await fetch(
-                    `<?= BASE_URL ?>/api/v1/classes_by_teacher.php?teacher_id=${teacherId}`
+                    `${BASE_URL}/api/v1/classes_by_teacher.php?teacher_id=${teacherId}`
                 );
 
                 const data = await response.json();
@@ -931,7 +931,7 @@ $revenueCard = $conn->query($getRevenueCard)->fetch(PDO::FETCH_ASSOC)['total'];
 
                 params.set('status', statuses.join(','));
 
-                const url = <?= BASE_URL ?>.`/api/v1/dashboard.php?${params.toString()}`;
+                const url = `${BASE_URL}/api/v1/dashboard.php?${params.toString()}`;
                 console.log("Final URL:", url);
 
                 const res = await fetch(url);
