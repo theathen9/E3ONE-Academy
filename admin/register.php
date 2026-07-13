@@ -1,19 +1,5 @@
 <?php
 //./admin/register.php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-// var_dump($_SESSION['csrf_token']);
-// var_dump($_POST['csrf_token']);
-// exit;
-
-// include_once __DIR__ . '/../config/db.php';
-// include_once __DIR__ . '/../core/DB.php';
-// include_once __DIR__ . '/../../core/CRUD.php';
-// include_once __DIR__ . '/../core/ORM.php';
 
 include_once __DIR__ . '/../config/bootstrap.php';
 include_once __DIR__ . '/../app/api/v1/auth.php';
@@ -25,14 +11,11 @@ include_once __DIR__ . '/../components/Avatar.php';
 include_once __DIR__ . '/../components/RegisterStaff.php';
 include_once __DIR__ . '/../components/RegisterStudent.php';
 
-
-
 // include_once __DIR__ . '/api/dashboard.php';
 // Generate token
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
-
 
 
 $userId = checkAuth();
@@ -43,13 +26,6 @@ if (!$userId) {
 }
 
 authorizeRole('admin');
-
-
-// var_dump($_SESSION);
-// var_dump($_COOKIE);
-// exit;
-
-
 
 include __DIR__ . '/../data/dataSchema.php';
 // include_once "/config/db.php";
