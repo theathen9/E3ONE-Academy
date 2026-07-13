@@ -476,7 +476,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // ---------------- LOAD PROVINCE ----------------
-            fetch(`${BASE_API}?type=provinces`)
+            fetch(`${BASE_URL}?type=provinces`)
                 .then(r => r.json())
                 .then(data => {
                     addOptions(province, data, "Province", false);
