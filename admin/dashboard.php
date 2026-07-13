@@ -525,9 +525,6 @@ $revenueCard = $conn->query($getRevenueCard)->fetch(PDO::FETCH_ASSOC)['total'];
                 </div>
         </main>
     </div>
-            <script>
-         const BASE_URL = "<?= BASE_URL ?>";
-            </script>
     <script src="../src/assets/js/script.js"></script>
     <script src="../src/assets/js/navbar-toggle-action.js"></script>
     <script src="../src/assets/js/user-profile.js"></script>
@@ -540,6 +537,8 @@ $revenueCard = $conn->query($getRevenueCard)->fetch(PDO::FETCH_ASSOC)['total'];
         let selectYear = "<?= $selectedYear ?>";
         let selectClass = "<?= $selectedClass ?>";
         let selectTeacher = "<?= $selectTeacher  ?>";
+         const BASE_URL = "<?= BASE_URL ?>";
+        
 
         // ----------------------
         // Flatpickr Setup
