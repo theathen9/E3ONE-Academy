@@ -1,6 +1,8 @@
 <?php
 //./admin/register.php
-
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include_once __DIR__ . '/../config/bootstrap.php';
 include_once __DIR__ . '/../app/api/v1/auth.php';
 
@@ -174,7 +176,7 @@ if (is_array($getClass)) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCSRF();
-    require_once __DIR__ . '/../app/api/v1/register_process.php';
+    require_once __DIR__ . '/../api/v1/register_process.php';
     // header('Location: ' . BASE_URL . '/admin/register.php');
     exit;
 }
