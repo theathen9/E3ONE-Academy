@@ -336,7 +336,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script>
         // const BASE_API = "/system-management/api/v1/address.php";
-        const BASE_URL = <?= BASE_URL ?>;
+        const BASE_URL = "<?= BASE_URL ?";
 
         function reset(select, label, disable = true) {
             select.innerHTML = `<option value="">-- ${label} --</option>`;
