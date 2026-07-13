@@ -139,8 +139,8 @@ function register_staff($conn, $idCodeStaff)
                         <?php
                         $departments = getDepartments($conn, 100, 0);
 
-                        if ($departments && $departments->num_rows > 0):
-                            while ($row = $departments->fetch_assoc()):
+                        if ($departments && $departments ->num_rows > 0):
+                            while ($row = $departments->fetch(PDO::FETCH_ASSOC)):
                         ?>
 
                                 <option value="<?= $row['department_id']; ?>"
