@@ -8,37 +8,37 @@ services:
       - "8080:80"
     volumes:
       - ./:/var/www/html
-#     depends_on:
-#       - mysql
-#       - postgres
+    depends_on:
+      - mysql
+      - postgres
 
-#   mysql:
-#     image: mysql:8.4
-#     container_name: my_mysql
-#     restart: unless-stopped
-#     environment:
-#       MYSQL_ROOT_PASSWORD: root
-#       MYSQL_DATABASE: school_db
-#       MYSQL_USER: user
-#       MYSQL_PASSWORD: password
-#     ports:
-#       - "3306:3306"
-#     volumes:
-#       - mysql_data:/var/lib/mysql
+  mysql:
+    image: mysql:8.4
+    container_name: my_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: school_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
 
-#   postgres:
-#     image: postgres:17
-#     container_name: my_postgres
-#     restart: unless-stopped
-#     environment:
-#       POSTGRES_DB: systemacademy
-#       POSTGRES_USER: postgres
-#       POSTGRES_PASSWORD: postgres
-#     ports:
-#       - "5432:5432"
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/data
+  postgres:
+    image: postgres:17
+    container_name: my_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: systemacademy
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
-# volumes:
-#   mysql_data:
-#   postgres_data:
+volumes:
+  mysql_data:
+  postgres_data:
