@@ -4,14 +4,14 @@ header('Content-Type: application/json');
 
 include_once __DIR__ . '/../../../config/bootstrap.php';
 // include_once __DIR__ . '/../../../config/bootstrap.php';
-
+$user_id = checkAuth();
 
 if (!isset($_COOKIE['refresh_token']) || empty($_COOKIE['refresh_token'])) {
     http_response_code(401);
     exit;
 }
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($user_id)) {
     http_response_code(401);
     echo json_encode([
         "success" => false,
@@ -19,9 +19,6 @@ if (!isset($_SESSION['user_id'])) {
     ]);
     exit;
 }
-
-$user_id = $_SESSION['user_id'];
-
 
 $db = new DB($conn);
 $userORM = new ORM($db, "tblUsers u", "user_id");
