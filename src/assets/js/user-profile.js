@@ -14,7 +14,7 @@ function updateUserUI(user) {
             ? `${BASE_URL}/uploads/photos/${user.profile_image}`
             : `${BASE_URL}/src/assets/default-user.png`;
     }
-    // console.log("DISPLAY NAME:", user.display_name);
+    console.log("DISPLAY NAME:", user.display_name);
 
 }
 
