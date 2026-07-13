@@ -1,13 +1,9 @@
 <?php
 // ./data/register_staff.php
-function register_staff($conn, $idCodeStaff)
+
+function register_staff($conn, $departmentORM, $idCodeStaff)
 {
     $departmentORM = new ORM($conn, 'tblDepartments');
-
-$departments = $departmentORM
-    ->limit(100)
-    ->offset(0)
-    ->get();
 
     $autoNameFS = "សា_" . $idCodeStaff;
     $autoNameMS = "មា_" . $idCodeStaff;
