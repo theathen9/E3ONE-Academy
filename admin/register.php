@@ -75,13 +75,13 @@ $roomCRUD = new ORM($db, "tblRooms", "room_id");
 $timeSlotCRUD = new ORM($db, "tblTimeSlots", "slot_id");
 $timetablCRUD = new ORM($db, "tblTimetables tt", "timetable_id");
 $paymentMethodsCRUD = new ORM($db, "tblPaymentMethods", "method_id");
-$demartmentCRUD = new ORM($db, "tblDemartments", "deparment_id");
+$departmentCRUD = new ORM($db, "tblDepartments", "department_id");
 
 
 $getClass = $classCRUD->get("*", "", [], "", 100, 0);
 $paymentMethods = $paymentMethodsCRUD->get("*", "", [], "", 10, 0);
 $departments = $demartmentCRUD
-    ->limit(100)
+    ->limit(25)
     ->offset(0)
     ->get();
 
