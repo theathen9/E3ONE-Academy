@@ -1,5 +1,4 @@
 // ./src/assets/js/user-profile.js
-const BASE_URL = null;
 
 function updateUserUI(user) {
     const username = document.querySelector("#username");
