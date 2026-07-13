@@ -80,7 +80,7 @@ $departmentCRUD = new ORM($db, "tblDepartments", "department_id");
 
 $getClass = $classCRUD->get("*", "", [], "", 100, 0);
 $paymentMethods = $paymentMethodsCRUD->get("*", "", [], "", 10, 0);
-$departments = $demartmentCRUD
+$departments = $departmentCRUD
     ->limit(25)
     ->offset(0)
     ->get();
