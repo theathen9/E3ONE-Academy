@@ -75,10 +75,15 @@ $roomCRUD = new ORM($db, "tblRooms", "room_id");
 $timeSlotCRUD = new ORM($db, "tblTimeSlots", "slot_id");
 $timetablCRUD = new ORM($db, "tblTimetables tt", "timetable_id");
 $paymentMethodsCRUD = new ORM($db, "tblPaymentMethods", "method_id");
+$demartmentCRUD = new ORM($db, "tblDemartments", "deparment_id");
 
 
 $getClass = $classCRUD->get("*", "", [], "", 100, 0);
 $paymentMethods = $paymentMethodsCRUD->get("*", "", [], "", 10, 0);
+$departments = $demartmentCRUD
+    ->limit(100)
+    ->offset(0)
+    ->get();
 
 
 $res = $studentCRUD
@@ -275,7 +280,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <?= csrf_field(); ?>
 
                                 <input type="hidden" name="created_by" value="<?= $_SESSION['reference_id'] ?? '' ?>">
-                                <?php register_staff($conn, $idCodeStaff); ?>
+                                <?php register_staff($conn, $departments, $idCodeStaff); ?>
                             </form>
                         </div>
 
