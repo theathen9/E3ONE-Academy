@@ -3,8 +3,6 @@
 
 function register_staff($conn, $departmentORM, $idCodeStaff)
 {
-    $departmentORM = new ORM($conn, 'tblDepartments');
-
     $autoNameFS = "សា_" . $idCodeStaff;
     $autoNameMS = "មា_" . $idCodeStaff;
     $autoNameLS = "នា_" . $idCodeStaff;
