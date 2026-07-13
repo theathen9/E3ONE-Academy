@@ -636,7 +636,7 @@ function register_student($conn, $classes = [], $paymentsMethods = [], $idCode =
                 formData.append("csrf_token", this.csrf);
 
                 try {
-                    const res = await fetch("/system-management/api/v1/register_process.php", {
+                    const res = await fetch("${BASE_URL}/api/v1/register_process.php", {
                         method: "POST",
                         body: formData,
                         credentials: "same-origin"
@@ -869,7 +869,7 @@ function register_student($conn, $classes = [], $paymentsMethods = [], $idCode =
 
                     // SESSION EXPIRED
                     if (!data.success && data.error === "Session expired") {
-                        window.location.href = "/system-management/admin/register.php?error=session_expired";
+                        window.location.href = "${BASE_URL}/admin/register.php?error=session_expired";
                         return;
                     }
 
@@ -894,7 +894,7 @@ function register_student($conn, $classes = [], $paymentsMethods = [], $idCode =
 
                     // Open invoice FIRST
                     const invoiceWindow = window.open(
-                        `${BASE_URL}/app/api/v1/generate_invoice.php?id=${invoiceId}`,
+                        `${BASE_URL}/api/v1/generate_invoice.php?id=${invoiceId}`,
                         "_blank"
                     );
 
@@ -928,7 +928,7 @@ function register_student($conn, $classes = [], $paymentsMethods = [], $idCode =
             //     const invoiceId = lastInvoiceId || data.invoice_id;
 
             //     window.open(
-            //         `${BASE_URL}/app/api/v1/generate_invoice.php?id=${invoiceId}`,
+            //         `${BASE_URL}/api/v1/generate_invoice.php?id=${invoiceId}`,
             //         "_blank"
             //     );
             // });
