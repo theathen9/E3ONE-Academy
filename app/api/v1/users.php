@@ -3,7 +3,7 @@
 header('Content-Type: application/json');
 
 include_once __DIR__ . '/../../../config/bootstrap.php';
-include_once __DIR__ . '/../../../../../api/v1/auth.php';
+include_once __DIR__ . '/api/v1/auth.php';
 
 // include_once __DIR__ . '/../../../config/bootstrap.php';
 $user_id = checkAuth();
