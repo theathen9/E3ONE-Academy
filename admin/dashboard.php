@@ -534,7 +534,7 @@ $revenueCard = $conn->query($getRevenueCard)->fetch(PDO::FETCH_ASSOC)['total'];
         let selectYear = "<?= $selectedYear ?>";
         let selectClass = "<?= $selectedClass ?>";
         let selectTeacher = "<?= $selectTeacher  ?>";
-         const BASE_URL = "<?= BASE_URL ?>";
+         const BASE_URL = `<?= BASE_URL ?>`;
         
 
         // ----------------------
