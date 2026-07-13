@@ -138,8 +138,8 @@ function register_staff($conn, $department, $idCodeStaff)
 
                       <?php
 
-if (!empty($departmentORM)):
-    foreach ($departmentORM as $row):
+if (!empty($department)):
+    foreach ($department as $row):
 ?>
 
     <option value="<?= $row['department_id']; ?>"
