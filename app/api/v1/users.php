@@ -78,10 +78,9 @@ echo json_encode([
             : $user['username'])
     ],
     "debug" => [
+        'session_id' => session_id(),
         "cookie" => $_COOKIE,
         "session" => $_SESSION,
     ]
 ]);
-
-exit;
 ?>
