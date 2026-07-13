@@ -105,7 +105,6 @@ $datePicker = date('M d, Y', strtotime($startDate)) . ' — ' . date('M d, Y', s
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <script src="../src/assets/js/user-profile.js" defer></script>
     <link rel="stylesheet" href="../src/style.css">
 
 
@@ -526,8 +525,13 @@ $revenueCard = $conn->query($getRevenueCard)->fetch(PDO::FETCH_ASSOC)['total'];
                 </div>
         </main>
     </div>
+            <script>
+         const BASE_URL = "<?= BASE_URL ?>";
+            </script>
     <script src="../src/assets/js/script.js"></script>
     <script src="../src/assets/js/navbar-toggle-action.js"></script>
+    <script src="../src/assets/js/user-profile.js"></script>
+            
 
 
     <script>
@@ -536,7 +540,6 @@ $revenueCard = $conn->query($getRevenueCard)->fetch(PDO::FETCH_ASSOC)['total'];
         let selectYear = "<?= $selectedYear ?>";
         let selectClass = "<?= $selectedClass ?>";
         let selectTeacher = "<?= $selectTeacher  ?>";
-         const BASE_URL = "<?= BASE_URL ?>";
 
         // ----------------------
         // Flatpickr Setup
