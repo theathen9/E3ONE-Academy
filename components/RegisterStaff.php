@@ -1,7 +1,7 @@
 <?php
 // ./data/register_staff.php
 
-function register_staff($conn, $departmentORM, $idCodeStaff)
+function register_staff($conn, $department, $idCodeStaff)
 {
     $autoNameFS = "សា_" . $idCodeStaff;
     $autoNameMS = "មា_" . $idCodeStaff;
