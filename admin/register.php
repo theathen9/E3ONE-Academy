@@ -196,16 +196,12 @@ if (is_array($getClass)) {
     }
 }
 
-
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCSRF();
     require_once __DIR__ . '/../app/api/v1/register_process.php';
     // header('Location: ' . BASE_URL . '/admin/register.php');
     exit;
 }
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -309,6 +305,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </main>
     </div>
+
     <script src="../src/assets/js/navbar-toggle-action.js"></script>
 
     <script>
@@ -476,7 +473,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // ---------------- LOAD PROVINCE ----------------
-            fetch(`${BASE_URL}?type=provinces`)
+            fetch(`${BASE_URL}/api/v1/address?type=provinces`)
                 .then(r => r.json())
                 .then(data => {
                     addOptions(province, data, "Province", false);
