@@ -106,6 +106,7 @@ $datePicker = date('M d, Y', strtotime($startDate)) . ' — ' . date('M d, Y', s
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <link rel="stylesheet" href="../src/style.css">
+    <script src="../src/assets/js/user-profile.js" defer></script>
 
 
     <style>
@@ -527,10 +528,6 @@ $revenueCard = $conn->query($getRevenueCard)->fetch(PDO::FETCH_ASSOC)['total'];
     </div>
     <script src="../src/assets/js/script.js"></script>
     <script src="../src/assets/js/navbar-toggle-action.js"></script>
-    <script src="../src/assets/js/user-profile.js"></script>
-            
-
-
     <script>
         let startDate = "<?= $startDate ?>";
         let endDate = "<?= $endDate ?>";
