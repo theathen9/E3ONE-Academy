@@ -76,11 +76,12 @@ echo json_encode([
             !empty($user['full_name_kh']) ? $user['full_name_kh']
             : (!empty($user['full_name_en']) ? $user['full_name_en']
             : $user['username'])
+    ],
+    "debug" => [
+        "cookie" => $_COOKIE,
+        "session" => $_SESSION,
     ]
 ]);
 
-echo json_encode([
-    "cookie" => $_COOKIE,
-    "session" => $_SESSION,
-]);
+exit;
 ?>
