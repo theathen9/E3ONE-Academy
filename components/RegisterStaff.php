@@ -2,6 +2,12 @@
 // ./data/register_staff.php
 function register_staff($conn, $idCodeStaff)
 {
+    $departmentORM = new ORM($conn, 'tblDepartments');
+
+$departments = $departmentORM
+    ->limit(100)
+    ->offset(0)
+    ->get();
 
     $autoNameFS = "សា_" . $idCodeStaff;
     $autoNameMS = "មា_" . $idCodeStaff;
@@ -136,24 +142,25 @@ function register_staff($conn, $idCodeStaff)
                     <select name="department_id" id="department_id" class="form-select" required>
                         <option value="">-- Select Department --</option>
 
-                        <?php
-                        $departments = getDepartments($conn, 100, 0);
+                      <?php
 
-                        if ($departments && $departments ->num_rows > 0):
-                            while ($row = $departments->fetch(PDO::FETCH_ASSOC)):
-                        ?>
+if (!empty($departmentORM)):
+    foreach ($departmentORM as $row):
+?>
 
-                                <option value="<?= $row['department_id']; ?>"
-                                    data-code="<?= htmlspecialchars($row['department_code']); ?>">
-                                    <?= htmlspecialchars($row['department_name']); ?>
-                                </option>
+    <option value="<?= $row['department_id']; ?>"
+        data-code="<?= htmlspecialchars($row['department_code']); ?>">
+        <?= htmlspecialchars($row['department_name']); ?>
+    </option>
 
-                            <?php endwhile;
-                        else: ?>
+<?php
+    endforeach;
+else:
+?>
 
-                            <option value="">No Department Found</option>
+    <option value="">No Department Found</option>
 
-                        <?php endif; ?>
+<?php endif; ?>
 
                     </select>
                 </div>
