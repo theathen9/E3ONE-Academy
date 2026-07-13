@@ -330,7 +330,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
 
     <script>
-        const BASE_API = "/system-management/api/v1/address.php";
+        // const BASE_API = "/system-management/api/v1/address.php";
+        const BASE_URL = <?= BASE_URL ?>;
 
         function reset(select, label, disable = true) {
             select.innerHTML = `<option value="">-- ${label} --</option>`;
@@ -496,7 +497,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!province.value) return;
 
-                const res = await fetch(`${BASE_API}?type=districts&province=${province.value}`);
+                const res = await fetch(`${BASE_URL}/api/v1/address?type=districts&province=${province.value}`);
                 const data = await res.json();
 
                 addOptions(district, data, "District");
@@ -544,7 +545,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!district.value) return;
 
-                const res = await fetch(`${BASE_API}?type=communes&province=${province.value}&district=${district.value}`);
+                const res = await fetch(`${BASE_URL}/api/v1/address?type=communes&province=${province.value}&district=${district.value}`);
                 const data = await res.json();
 
                 addOptions(commune, data, "Commune");
@@ -596,7 +597,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!commune.value) return;
 
                 const res = await fetch(
-                    `${BASE_API}?type=villages&province=${province.value}&district=${district.value}&commune=${commune.value}`
+                    `${BASE_URL}/api/v1/address?type=villages&province=${province.value}&district=${district.value}&commune=${commune.value}`
                 );
 
                 const data = await res.json();
