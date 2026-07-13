@@ -894,7 +894,7 @@ function register_student($conn, $classes = [], $paymentsMethods = [], $idCode =
 
                     // Open invoice FIRST
                     const invoiceWindow = window.open(
-                        `/system-management/app/api/v1/generate_invoice.php?id=${invoiceId}`,
+                        `${BASE_URL}/app/api/v1/generate_invoice.php?id=${invoiceId}`,
                         "_blank"
                     );
 
@@ -906,13 +906,13 @@ function register_student($conn, $classes = [], $paymentsMethods = [], $idCode =
 
                     // redirect AFTER opening
                     setTimeout(() => {
-                        window.location.href = "/system-management/admin/register.php";
+                        window.location.href = "${BASE_URL}/admin/register.php";
                     }, 1000);
 
                 } catch (err) {
                     console.error(err);
                     btnSumitStudent.disabled = false;
-                    window.location.href = "/system-management/admin/register.php";
+                    window.location.href = "${BASE_URL}/admin/register.php";
                 }
             });
 
@@ -928,7 +928,7 @@ function register_student($conn, $classes = [], $paymentsMethods = [], $idCode =
             //     const invoiceId = lastInvoiceId || data.invoice_id;
 
             //     window.open(
-            //         `/system-management/app/api/v1/generate_invoice.php?id=${invoiceId}`,
+            //         `${BASE_URL}/app/api/v1/generate_invoice.php?id=${invoiceId}`,
             //         "_blank"
             //     );
             // });
