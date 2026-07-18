@@ -40,38 +40,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $error = "Username or ID and Password are required!";
     } else {
 
-        $id = filter_var($user, FILTER_VALIDATE_INT);
+       
+     $db = new DB($conn);
+$userORM = new ORM($db, "tblUsers u", "user_id");
 
-        $sql = "
-    SELECT
-        u.user_id,
-        u.username,
-        u.password,
-        u.email,
-        u.role_id,
-        r.role_name,
-        u.reference_id,
-        u.reference_type,
-        u.status,
-        u.last_login
-    FROM tblUsers AS u
-    INNER JOIN tblRoles AS r
-        ON r.role_id = u.role_id
-    WHERE
-        u.username = :user
-        OR u.email = :user
-        OR (:id IS NOT NULL AND u.user_id = :id)
-    LIMIT 1
-";
+$id = filter_var($user, FILTER_VALIDATE_INT);
 
-        $stmt = $conn->prepare($sql);
-
-        $stmt->execute([
-            ':user' => $user,
-            ':id'   => $id,
-        ]);
-
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+$row = $userORM
+    ->select([
+        "u.user_id",
+        "u.username",
+        "u.password",
+        "u.role_id",
+        "r.role_name",
+        "u.email",
+        "u.reference_id",
+        "u.reference_type",
+        "u.user_agent",
+        "u.ip_address"
+    ])
+    ->join("tblRoles r", "u.role_id = r.role_id", "LEFT")
+    ->whereRaw(
+        "(u.username = ? OR u.email = ? OR u.user_id = ?)",
+        [$user, $user, $id ?: 0]
+    )
+    ->first();
 
 
         if ($row && password_verify($pass, $row["password"])) {
