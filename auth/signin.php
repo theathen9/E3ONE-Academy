@@ -2,10 +2,8 @@
 // ./auth/signin.php (from Page)
 date_default_timezone_set('Asia/Phnom_Penh');
 
-// require_once dirname(__DIR__) . '/config/bootstrap.php';
-require_once __DIR__ . '/../config/bootstrap.php';
+require_once dirname(__DIR__) . '/config/bootstrap.php';
 require_once __DIR__ . '/../app/api/v1/auth.php';
-require_once __DIR__ . '/../data/dataSchema.php';
 
 $user = checkAuth();
 if ($user && isset($_SESSION['loggedin'])) {
@@ -41,36 +39,39 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $error = "Username or ID and Password are required!";
     } else {
 
-        $id = intval($user);
+        $id = filter_var($user, FILTER_VALIDATE_INT);
 
-        $stmt = $conn->prepare("
-            SELECT 
-                u.user_id,
-                u.username,
-                u.password,
-                u.role_id,
-                r.role_name,
-                u.email,
-                u.reference_id,
-                u.reference_type,
-                u.user_agent,
-                u.ip_address
-            FROM tblUsers u
-            LEFT JOIN tblRoles r ON u.role_id = r.role_id
-            WHERE u.username = :user 
-               OR u.user_id = :id 
-               OR u.email = :user
-            LIMIT 1
-        ");
+        $sql = "
+    SELECT
+        u.user_id,
+        u.username,
+        u.password,
+        u.email,
+        u.role_id,
+        r.role_name,
+        u.reference_id,
+        u.reference_type,
+        u.status,
+        u.last_login
+    FROM tblUsers AS u
+    INNER JOIN tblRoles AS r
+        ON r.role_id = u.role_id
+    WHERE
+        u.username = :user
+        OR u.email = :user
+        OR (:id IS NOT NULL AND u.user_id = :id)
+    LIMIT 1
+";
+
+        $stmt = $conn->prepare($sql);
 
         $stmt->execute([
-            ":user" => $user,
-            ":id"   => $id
+            ':user' => $user,
+            ':id'   => $id,
         ]);
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        
 
         if ($row && password_verify($pass, $row["password"])) {
 
@@ -99,7 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ":access_token"  => $hashedToken,
                 ":refresh_token" => $hashedRefresh,
                 ":access_expiry" => $accessExpiry,
-                ":refresh_expiry"=> $refreshExpiry,
+                ":refresh_expiry" => $refreshExpiry,
                 ":user_id"       => $row['user_id']
             ]);
 
@@ -167,7 +168,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>Dashboard | <?php echo $infoSchemaData[1]["name_short"] ?></title>
+    <title>Sign in | Empowerment Education English One></title>
     <link rel="icon" type="image/png" href="../src/assets/icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
