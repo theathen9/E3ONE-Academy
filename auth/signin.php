@@ -30,7 +30,20 @@ if ($user && isset($_SESSION['loggedin'])) {
 $success = "";
 $error = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+echo "<pre>";
 
+echo "Session ID: " . session_id() . PHP_EOL;
+
+echo "Cookie: ";
+var_dump($_COOKIE['PHPSESSID'] ?? null);
+
+echo "Session:";
+print_r($_SESSION);
+
+echo "POST:";
+print_r($_POST);
+
+exit;
     verifyCSRF();
 
     $user = trim($_POST["username"]);
