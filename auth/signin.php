@@ -30,7 +30,7 @@ if ($user && isset($_SESSION['loggedin'])) {
 $success = "";
 $error = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-echo "<pre>";
+// echo "<pre>";
 
 // echo "Session ID: " . session_id() . PHP_EOL;
 
