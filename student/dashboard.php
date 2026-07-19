@@ -221,6 +221,7 @@
                 background: #e74c3c;
             }
         </style>
+        <?php VercelAnalytics(); ?>
 
     </head>
 
