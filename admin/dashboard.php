@@ -212,6 +212,7 @@ $datePicker = date('M d, Y', strtotime($startDate)) . ' — ' . date('M d, Y', s
             font-weight: 700;
         }
     </style>
+    <?php VercelAnalytics(); ?>
 
 </head>
 

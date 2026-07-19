@@ -225,6 +225,7 @@
                 font-weight: 700;
             }
         </style>
+        <?php VercelAnalytics(); ?>
 
     </head>
 
