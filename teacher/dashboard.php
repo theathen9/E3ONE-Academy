@@ -222,6 +222,7 @@
             }
         </style>
         <?php VercelAnalytics(); ?>
+        <?php VercelSpeedInsights(); ?>
 
     </head>
 
