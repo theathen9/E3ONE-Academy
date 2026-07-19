@@ -68,9 +68,7 @@ $row = $userORM
         "r.role_name",
         "u.email",
         "u.reference_id",
-        "u.reference_type",
-        "u.user_agent",
-        "u.ip_address"
+        "u.reference_type"
     ])
     ->join("tblRoles r", "u.role_id = r.role_id", "LEFT")
     ->whereRaw(
@@ -93,23 +91,17 @@ $row = $userORM
             $accessExpiry  = date('Y-m-d H:i:s', strtotime('+5 minutes'));
             $refreshExpiry = date('Y-m-d H:i:s', strtotime('+1 days'));
 
-            $update = $conn->prepare("
-                UPDATE tblUsers 
-                SET last_login = NOW(),
-                    access_token = :access_token,
-                    refresh_token = :refresh_token,
-                    access_expiry = :access_expiry,
-                    refresh_expiry = :refresh_expiry
-                WHERE user_id = :user_id
-            ");
+           $tokenORM = new ORM("tblUserTokens");
 
-            $update->execute([
-                ":access_token"  => $hashedToken,
-                ":refresh_token" => $hashedRefresh,
-                ":access_expiry" => $accessExpiry,
-                ":refresh_expiry" => $refreshExpiry,
-                ":user_id"       => $row['user_id']
-            ]);
+$tokenORM->insert([
+    "user_id"            => $row["user_id"],
+    "access_token_hash"  => $hashedToken,
+    "refresh_token_hash" => $hashedRefresh,
+    "access_expiry"      => $accessExpiry,
+    "refresh_expiry"     => $refreshExpiry,
+    "user_agent"         => $_SERVER["HTTP_USER_AGENT"] ?? "",
+    "ip_address"         => $_SERVER["REMOTE_ADDR"] ?? null,
+]);
 
             $_SESSION['loggedin'] = true;
             $_SESSION["user_id"] = $row["user_id"];
