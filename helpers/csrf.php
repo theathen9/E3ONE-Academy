@@ -1,58 +1,73 @@
 <?php
-// ./helpers/csrf.php
-function generateCSRF()
+// helpers/csrf.php
+
+function generateCSRF(): string
 {
-    if (session_status() !== PHP_SESSION_ACTIVE) {
-        session_start();
+    $token = $_COOKIE['XSRF-TOKEN'] ?? '';
+
+    if (
+        empty($token) ||
+        !preg_match('/^[a-f0-9]{64}$/', $token)
+    ) {
+        $token = bin2hex(random_bytes(32));
+
+        $secure = (
+            !empty($_SERVER['HTTPS']) &&
+            $_SERVER['HTTPS'] !== 'off'
+        );
+
+        setcookie('XSRF-TOKEN', $token, [
+            'expires'  => time() + 3600,
+            'path'     => '/',
+            'secure'   => $secure,
+            'httponly' => false,
+            'samesite' => 'Lax',
+        ]);
     }
 
-    if (!isset($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-
-    return $_SESSION['csrf_token'];
+    return $token;
 }
 
-function csrf_field()
+function csrf_field(): string
 {
-    if (session_status() !== PHP_SESSION_ACTIVE) {
-        session_start();
-    }
+    $token = generateCSRF();
 
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-
-    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($_SESSION['csrf_token']) . '">';
+    return '<input type="hidden" name="csrf_token" value="' .
+        htmlspecialchars($token, ENT_QUOTES, 'UTF-8') .
+        '">';
 }
 
-function verifyCSRF()
+function verifyCSRF(): void
 {
-    if (session_status() !== PHP_SESSION_ACTIVE) {
-        session_start();
-    }
+    $sessionToken = $_COOKIE['XSRF-TOKEN'] ?? '';
 
-    $token = $_POST['csrf_token']
+    $requestToken =
+        $_POST['csrf_token']
         ?? $_SERVER['HTTP_X_CSRF_TOKEN']
         ?? '';
 
-    if (!$token || !isset($_SESSION['csrf_token'])) {
+    if (
+        empty($sessionToken) ||
+        empty($requestToken)
+    ) {
         http_response_code(403);
+
         exit(json_encode([
-            "success" => false,
-            "error" => "CSRF missing",
-            "debug" => [
-                "session" => $_SESSION['csrf_token'] ?? null,
-                "post" => $token
-            ]
+            'success' => false,
+            'error' => 'CSRF missing'
         ]));
     }
 
-    if (!hash_equals($_SESSION['csrf_token'], $token)) {
+    if (
+        !is_string($sessionToken) ||
+        !is_string($requestToken) ||
+        !hash_equals($sessionToken, $requestToken)
+    ) {
         http_response_code(403);
+
         exit(json_encode([
-            "success" => false,
-            "error" => "Invalid CSRF token"
+            'success' => false,
+            'error' => 'Invalid CSRF token'
         ]));
     }
 }
