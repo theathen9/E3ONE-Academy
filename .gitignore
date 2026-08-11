@@ -1,83 +1,144 @@
 # ======================
+
 # Dependencies
+
 # ======================
-/vendor/
-vendor/
-vendor/dompdf/dompdf/
+
 node_modules/
-
-
-# ======================
-# GitHub Actions
-# ======================
-
+vendor/
 
 # ======================
-# Environment
+
+# Environment Files
+
 # ======================
+
 .env
 .env.*
 !.env.example
 
 # ======================
+
 # Logs
+
 # ======================
+
 *.log
 logs/
 
 # ======================
-# Cache / Sessions
+
+# Cache / Temporary Files
+
 # ======================
+
 cache/
 tmp/
 temp/
 sessions/
 
 # ======================
-# Uploads
+
+# Uploaded / Generated Storage
+
 # ======================
+
 uploads/
 storage/
 
 # ======================
-# IDE
-# ======================
-.vscode/
-.idea/
+
+# IDE / Editor
 
 # ======================
-# OS
+
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
 # ======================
+
+# OS Files
+
+# ======================
+
 .DS_Store
 Thumbs.db
 
 # ======================
-# Build
+
+# Laragon / Local Config
+
 # ======================
+
+laragon.ini
+
+# ======================
+
+# Build Output
+
+# ======================
+
 dist/
 build/
 
 # ======================
-# Database
-# ======================
-*.sql
-*.sqlite
+
+# Database Dumps
+
+# PostgreSQL / MySQL
 
 # ======================
+
+*.dump
+*.backup
+*.bak
+*.pgsql
+*.mysql
+*.sql.gz
+
+# PostgreSQL local password file
+
+.pgpass
+
+# MySQL client configuration
+
+.my.cnf
+
+# ======================
+
+# PHPUnit
+
+# ======================
+
+.phpunit.result.cache
+
+# ======================
+
 # Composer
-# ======================
-# Keep composer.lock committed
-# composer.lock
 
 # ======================
-# Secrets
+
+# Keep composer.lock committed
+
 # ======================
+
+# API Secrets / Private Config
+
+# ======================
+
 config/secrets.php
 config/private/
 
 # ======================
-# Archives
+
+# Generated Archives
+
 # ======================
+
 *.zip
 *.tar
 *.gz
