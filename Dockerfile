@@ -8,8 +8,7 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     zip \
-    libpq-dev \
-    && docker-php-ext-install 
+    libpq-dev 
 
 
 # Install Composer
