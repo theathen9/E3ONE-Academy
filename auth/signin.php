@@ -30,20 +30,20 @@ if ($user && isset($_SESSION['loggedin'])) {
 $success = "";
 $error = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-// echo "<pre>";
+    // echo "<pre>";
 
-// echo "Session ID: " . session_id() . PHP_EOL;
+    // echo "Session ID: " . session_id() . PHP_EOL;
 
-// echo "Cookie: ";
-// var_dump($_COOKIE['PHPSESSID'] ?? null);
+    // echo "Cookie: ";
+    // var_dump($_COOKIE['PHPSESSID'] ?? null);
 
-// echo "Session:";
-// print_r($_SESSION);
+    // echo "Session:";
+    // print_r($_SESSION);
 
-// echo "POST:";
-// print_r($_POST);
+    // echo "POST:";
+    // print_r($_POST);
 
-// exit;
+    // exit;
     verifyCSRF();
 
     $user = trim($_POST["username"]);
@@ -53,29 +53,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $error = "Username or ID and Password are required!";
     } else {
 
-       
-     $db = new DB($conn);
-$userORM = new ORM($db, "tblUsers u", "user_id");
 
-$id = filter_var($user, FILTER_VALIDATE_INT);
+        $db = new DB($conn);
+        $userORM = new ORM($db, "tblUsers u", "user_id");
 
-$row = $userORM
-    ->select([
-        "u.user_id",
-        "u.username",
-        "u.password",
-        "u.role_id",
-        "r.role_name",
-        "u.email",
-        "u.reference_id",
-        "u.reference_type"
-    ])
-    ->join("tblRoles r", "u.role_id = r.role_id", "LEFT")
-    ->whereRaw(
-        "(u.username = ? OR u.email = ? OR u.user_id = ?)",
-        [$user, $user, $id ?: 0]
-    )
-    ->first();
+        $id = filter_var($user, FILTER_VALIDATE_INT);
+
+        $row = $userORM
+            ->select([
+                "u.user_id",
+                "u.username",
+                "u.password",
+                "u.role_id",
+                "r.role_name",
+                "u.email",
+                "u.reference_id",
+                "u.reference_type"
+            ])
+            ->join("tblRoles r", "u.role_id = r.role_id", "LEFT")
+            ->whereRaw(
+                "(u.username = ? OR u.email = ? OR u.user_id = ?)",
+                [$user, $user, $id ?: 0]
+            )
+            ->first();
 
 
         if ($row && password_verify($pass, $row["password"])) {
@@ -91,17 +91,17 @@ $row = $userORM
             $accessExpiry  = date('Y-m-d H:i:s', strtotime('+5 minutes'));
             $refreshExpiry = date('Y-m-d H:i:s', strtotime('+1 days'));
 
-           $tokenORM = new ORM("tblUserTokens");
+            $tokenORM = new ORM($db, "tblUserTokens", "token_id");
 
-$tokenORM->insert([
-    "user_id"            => $row["user_id"],
-    "access_token_hash"  => $hashedToken,
-    "refresh_token_hash" => $hashedRefresh,
-    "access_expiry"      => $accessExpiry,
-    "refresh_expiry"     => $refreshExpiry,
-    "user_agent"         => $_SERVER["HTTP_USER_AGENT"] ?? "",
-    "ip_address"         => $_SERVER["REMOTE_ADDR"] ?? null,
-]);
+            $tokenORM->insert([
+                "user_id"            => $row["user_id"],
+                "access_token_hash"  => $hashedToken,
+                "refresh_token_hash" => $hashedRefresh,
+                "access_expiry"      => $accessExpiry,
+                "refresh_expiry"     => $refreshExpiry,
+                "user_agent"         => $_SERVER["HTTP_USER_AGENT"] ?? "",
+                "ip_address"         => $_SERVER["REMOTE_ADDR"] ?? null,
+            ]);
 
             $_SESSION['loggedin'] = true;
             $_SESSION["user_id"] = $row["user_id"];
@@ -171,8 +171,6 @@ $tokenORM->insert([
     <link rel="icon" type="image/png" href="../src/assets/icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <?php VercelAnalytics(); ?>
-    <?php VercelSpeedInsights(); ?>
 </head>
 
 <body style="background-image: url(../src/assets/bgSignin.jpg); " class="">
