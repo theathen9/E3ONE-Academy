@@ -2,9 +2,9 @@
 // ./auth/signin.php (from Page)
 date_default_timezone_set('Asia/Phnom_Penh');
 
-require_once __DIR__ . '/../config/bootstrap.php';
-require_once __DIR__ . '/../data/dataSchema.php';
-require_once __DIR__ . '/../app/api/v1/auth.php';
+include_once __DIR__ . '/../config/bootstrap.php';
+include_once __DIR__ . '/../data/dataSchema.php';
+include_once __DIR__ . '/../app/api/v1/auth.php';
 
 $user = checkAuth();
 if ($user && isset($_SESSION['loggedin'])) {
@@ -70,7 +70,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "u.reference_id",
                 "u.reference_type"
             ])
-            ->join("tblRoles r", "u.role_id = r.role_id", "LEFT")
+            ->join(
+                "tblRoles r",
+                "u.role_id = r.role_id",
+                "LEFT"
+            )
             ->whereRaw(
                 "(u.username = ? OR u.email = ? OR u.user_id = ?)",
                 [$user, $user, $id ?: 0]
@@ -94,13 +98,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $tokenORM = new ORM($db, "tblUserTokens", "token_id");
 
             $tokenORM->insert([
-                "user_id"            => $row["user_id"],
-                "access_token_hash"  => $hashedToken,
-                "refresh_token_hash" => $hashedRefresh,
-                "access_expiry"      => $accessExpiry,
-                "refresh_expiry"     => $refreshExpiry,
-                "user_agent"         => $_SERVER["HTTP_USER_AGENT"] ?? "",
-                "ip_address"         => $_SERVER["REMOTE_ADDR"] ?? null,
+                "user_id"       => $row["user_id"],
+                "access_token"  => $hashedToken,
+                "refresh_token" => $hashedRefresh,
+                "access_expiry" => $accessExpiry,
+                "refresh_expiry" => $refreshExpiry,
+                "user_agent"    => $_SERVER["HTTP_USER_AGENT"] ?? "",
+                "ip_address"    => $_SERVER["REMOTE_ADDR"] ?? null,
             ]);
 
             $_SESSION['loggedin'] = true;
