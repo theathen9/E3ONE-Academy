@@ -24,6 +24,7 @@ require_once __DIR__ . '/../helpers/request.php';
 require_once __DIR__ . '/../helpers/response.php';
 require_once __DIR__ . '/../helpers/upload.php';
 require_once __DIR__ . '/../helpers/csrf.php';
+generateCSRF();
 
 require_once __DIR__ . '/../core/DB.php';
 require_once __DIR__ . '/../core/ORM.php';
@@ -31,4 +32,4 @@ require_once __DIR__ . '/../core/Cache.php';
 
 require_once __DIR__ . '/../components/VercelAnalytics.php';
 require_once __DIR__ . '/../components/VercelSpeedInsights.php';
-?>
+
