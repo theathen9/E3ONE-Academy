@@ -17,10 +17,10 @@ include_once __DIR__ . '/../../components/Avatar.php';
 
 $userId = checkAuth();
 
-if (!$userId) {
-    header("Location: ../auth/signin.php");
-    exit;
-}
+// if (!$userId) {
+//     header("Location: ../auth/signin.php");
+//     exit;
+// }
 
 authorizeRole('admin');
 
